@@ -12,6 +12,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      const isAuthEndpoint = req.url.includes('/api/auth/login') || req.url.includes('/api/auth/register');
       let message = 'An unexpected error occurred.';
 
       if (error.error?.message) {
@@ -33,8 +34,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           toast.warning(message);
           break;
         case 401:
-          toast.error('Session expired. Please log in again.');
-          auth.logout();
+          if (!isAuthEndpoint) {
+            toast.error('Session expired. Please log in again.');
+            auth.logout();
+          }
           break;
         case 403:
           toast.error('Access denied. You do not have permission for this action.');
