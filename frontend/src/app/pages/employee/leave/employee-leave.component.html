@@ -1,0 +1,146 @@
+<div class="leave-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        <span class="material-icons">event_note</span>
+        My Leaves
+      </h1>
+      <p class="page-subtitle">Apply for leave and track your application status</p>
+    </div>
+    <button class="btn btn--primary" id="apply-leave-btn" (click)="openApplyForm()">
+      <span class="material-icons">add</span>
+      Apply for Leave
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="material-icons" style="color: #FBBF24">pending</span>
+      <div>
+        <div class="stat-val">{{ pendingCount }}</div>
+        <div class="stat-lbl">Pending</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="material-icons" style="color: #4ADE80">check_circle</span>
+      <div>
+        <div class="stat-val">{{ approvedCount }}</div>
+        <div class="stat-lbl">Approved</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="material-icons" style="color: #818CF8">folder_open</span>
+      <div>
+        <div class="stat-val">{{ myLeaves.length }}</div>
+        <div class="stat-lbl">Total Applied</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leave History -->
+  <div class="section-header">
+    <h2>Leave History</h2>
+  </div>
+
+  <div class="leave-list">
+    <div class="empty-state" *ngIf="myLeaves.length === 0">
+      <span class="material-icons">event_busy</span>
+      <h3>No leave applications yet</h3>
+      <p>Click "Apply for Leave" to submit your first request.</p>
+    </div>
+
+    <div class="leave-item" *ngFor="let leave of myLeaves">
+      <div class="leave-item__icon" [ngClass]="'icon--' + leave.leaveType?.toLowerCase()">
+        <span class="material-icons">event</span>
+      </div>
+      <div class="leave-item__info">
+        <div class="leave-item__top">
+          <span class="leave-type">{{ leave.leaveType }}</span>
+          <span class="leave-days">{{ getLeaveDays(leave.startDate, leave.endDate) }} day(s)</span>
+        </div>
+        <div class="leave-dates">
+          {{ leave.startDate | date:'MMM d' }} — {{ leave.endDate | date:'MMM d, y' }}
+        </div>
+        <div class="leave-reason">{{ leave.reason }}</div>
+        <div class="leave-comment" *ngIf="leave.reviewComment">
+          <span class="material-icons">comment</span>
+          {{ leave.reviewComment }}
+        </div>
+      </div>
+      <div class="leave-item__status">
+        <span class="status-badge" [ngClass]="getStatusClass(leave.status)">{{ leave.status }}</span>
+        <div class="applied-date" *ngIf="leave.createdAt">
+          Applied {{ leave.createdAt | date:'MMM d' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apply Leave Modal -->
+  <div class="modal-backdrop" *ngIf="showApplyForm" (click)="closeForm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3>Apply for Leave</h3>
+        <button class="modal__close" (click)="closeForm()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <form class="leave-form" (ngSubmit)="submitLeave()" #leaveForm="ngForm">
+        <div class="form-group">
+          <label>Leave Type *</label>
+          <div class="leave-type-grid">
+            <button
+              type="button"
+              *ngFor="let type of leaveTypes"
+              class="type-chip"
+              [class.active]="form.leaveType === type"
+              (click)="form.leaveType = type"
+              [id]="'type-' + type"
+            >
+              {{ type }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Start Date *</label>
+            <input type="date" [(ngModel)]="form.startDate" name="startDate" required id="startDate" />
+          </div>
+          <div class="form-group">
+            <label>End Date *</label>
+            <input type="date" [(ngModel)]="form.endDate" name="endDate" required id="endDate" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Reason *</label>
+          <textarea
+            [(ngModel)]="form.reason"
+            name="reason"
+            required
+            id="leaveReason"
+            rows="3"
+            placeholder="Please describe the reason for your leave..."
+          ></textarea>
+        </div>
+
+        <div class="leave-preview" *ngIf="form.startDate && form.endDate">
+          <span class="material-icons">info</span>
+          Requesting <strong>{{ getLeaveDays(form.startDate, form.endDate) }} day(s)</strong> of {{ form.leaveType }} leave
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" (click)="closeForm()">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="submit-leave-btn" [disabled]="leaveForm.invalid || isSubmitting">
+            <span class="material-icons">send</span>
+            {{ isSubmitting ? 'Submitting...' : 'Submit Application' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

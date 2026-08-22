@@ -1,0 +1,148 @@
+<div class="profile-page">
+  <div class="loading-state" *ngIf="isLoading">
+    <span class="material-icons spin">refresh</span>
+    Loading profile...
+  </div>
+
+  <div class="profile-content" *ngIf="profile && !isLoading">
+    <!-- Hero Card -->
+    <div class="hero-card">
+      <div class="hero-card__bg"></div>
+      <div class="hero-card__body">
+        <div class="avatar-ring">
+          <div class="avatar">{{ initials }}</div>
+        </div>
+        <div class="hero-info">
+          <h1 class="hero-name">{{ profile.firstName }} {{ profile.lastName }}</h1>
+          <p class="hero-designation">{{ profile.designation || 'Employee' }}</p>
+          <div class="hero-meta">
+            <span class="meta-chip">
+              <span class="material-icons">badge</span>
+              {{ profile.employeeId }}
+            </span>
+            <span class="meta-chip">
+              <span class="material-icons">domain</span>
+              {{ profile.department?.name || 'N/A' }}
+            </span>
+            <span class="meta-chip" [ngClass]="profile.status === 'ACTIVE' ? 'meta-chip--active' : 'meta-chip--inactive'">
+              <span class="material-icons">circle</span>
+              {{ profile.status }}
+            </span>
+          </div>
+        </div>
+        <button class="edit-btn" id="edit-profile-btn" (click)="startEdit()" *ngIf="!isEditing">
+          <span class="material-icons">edit</span>
+          Edit Profile
+        </button>
+      </div>
+    </div>
+
+    <!-- Info Grid -->
+    <div class="info-grid" *ngIf="!isEditing">
+      <div class="info-card">
+        <div class="info-card__header">
+          <span class="material-icons">contact_mail</span>
+          Contact Information
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value">{{ profile.email }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Phone</span>
+          <span class="info-value">{{ profile.phone || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Address</span>
+          <span class="info-value">{{ profile.address || '—' }}</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card__header">
+          <span class="material-icons">work_history</span>
+          Employment Details
+        </div>
+        <div class="info-row">
+          <span class="info-label">Employee ID</span>
+          <span class="info-value"><strong>{{ profile.employeeId }}</strong></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Department</span>
+          <span class="info-value">{{ profile.department?.name || 'N/A' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Designation</span>
+          <span class="info-value">{{ profile.designation || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Joining Date</span>
+          <span class="info-value">{{ profile.joiningDate | date:'MMMM d, y' }}</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card__header">
+          <span class="material-icons">security</span>
+          Account
+        </div>
+        <div class="info-row">
+          <span class="info-label">Role</span>
+          <span class="info-value">{{ currentUser?.role }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Status</span>
+          <span class="info-value">
+            <span class="status-badge" [class.status--active]="profile.status === 'ACTIVE'">{{ profile.status }}</span>
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Member Since</span>
+          <span class="info-value">{{ profile.createdAt | date:'MMMM y' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Form -->
+    <div class="edit-card" *ngIf="isEditing">
+      <div class="edit-card__header">
+        <h3><span class="material-icons">edit</span> Edit Profile</h3>
+        <p>You can update your personal contact information below.</p>
+      </div>
+
+      <form (ngSubmit)="saveProfile()" #profileForm="ngForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" [(ngModel)]="form.firstName" name="firstName" id="edit-firstName" required />
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" [(ngModel)]="form.lastName" name="lastName" id="edit-lastName" required />
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="text" [(ngModel)]="form.phone" name="phone" id="edit-phone" />
+          </div>
+          <div class="form-group form-group--full">
+            <label>Address</label>
+            <input type="text" [(ngModel)]="form.address" name="address" id="edit-address" />
+          </div>
+        </div>
+
+        <div class="read-only-note">
+          <span class="material-icons">lock</span>
+          Email, Employee ID, Department and Designation can only be changed by your HR or Admin.
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn--ghost" (click)="cancelEdit()">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="save-profile-btn" [disabled]="isSaving || profileForm.invalid">
+            <span class="material-icons">save</span>
+            {{ isSaving ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

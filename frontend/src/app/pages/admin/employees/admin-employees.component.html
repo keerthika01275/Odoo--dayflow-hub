@@ -1,0 +1,183 @@
+<div class="emp-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-title">
+        <span class="material-icons">badge</span>
+        Workforce Management
+      </h1>
+      <p class="page-subtitle">Manage employee records and department assignments</p>
+    </div>
+    <button class="btn btn--primary" id="add-employee-btn" (click)="openCreateModal()">
+      <span class="material-icons">add</span>
+      Add Employee
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Search by name, email, or ID..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="applyFilter()"
+        id="search-employees"
+      />
+    </div>
+    <select [(ngModel)]="filterDept" (ngModelChange)="applyFilter()" id="filter-dept" class="filter-select">
+      <option value="">All Departments</option>
+      <option *ngFor="let d of departments" [value]="d.id">{{ d.name }}</option>
+    </select>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-chip">
+      <span class="material-icons">people</span>
+      <strong>{{ employees.length }}</strong> Total Employees
+    </div>
+    <div class="stat-chip stat-chip--filtered">
+      <span class="material-icons">filter_list</span>
+      <strong>{{ filteredEmployees.length }}</strong> Showing
+    </div>
+    <div class="stat-chip stat-chip--dept">
+      <span class="material-icons">domain</span>
+      <strong>{{ departments.length }}</strong> Departments
+    </div>
+  </div>
+
+  <!-- Employee Table -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table class="emp-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>ID</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Joining Date</th>
+            <th>Status</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredEmployees.length === 0">
+            <td colspan="7" class="empty-row">
+              <span class="material-icons">person_search</span>
+              No employees found
+            </td>
+          </tr>
+          <tr *ngFor="let emp of filteredEmployees" class="emp-row">
+            <td class="emp-name-cell">
+              <div class="avatar">{{ emp.firstName?.charAt(0) }}{{ emp.lastName?.charAt(0) }}</div>
+              <div>
+                <div class="emp-name">{{ emp.firstName }} {{ emp.lastName }}</div>
+                <div class="emp-email">{{ emp.email }}</div>
+              </div>
+            </td>
+            <td><span class="id-badge">{{ emp.employeeId }}</span></td>
+            <td>{{ emp.department?.name || '—' }}</td>
+            <td>{{ emp.designation || '—' }}</td>
+            <td>{{ emp.joiningDate || '—' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(emp.status)">{{ emp.status }}</span>
+            </td>
+            <td class="actions-cell">
+              <button class="icon-btn icon-btn--edit" (click)="openEditModal(emp)" [id]="'edit-emp-' + emp.id" title="Edit">
+                <span class="material-icons">edit</span>
+              </button>
+              <button class="icon-btn icon-btn--delete" (click)="confirmDelete(emp.id)" [id]="'delete-emp-' + emp.id" title="Delete">
+                <span class="material-icons">delete</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation -->
+  <div class="modal-backdrop" *ngIf="deleteConfirmId !== null" (click)="closeModal()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal__icon modal__icon--danger">
+        <span class="material-icons">warning</span>
+      </div>
+      <h3>Remove Employee</h3>
+      <p>This action will permanently delete the employee record. This cannot be undone.</p>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" (click)="closeModal()">Cancel</button>
+        <button class="btn btn--danger" id="confirm-delete-btn" (click)="deleteEmployee()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create / Edit Modal -->
+  <div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal modal--lg" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3>{{ isEditMode ? 'Edit Employee' : 'Add New Employee' }}</h3>
+        <button class="modal__close" (click)="closeModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <form class="emp-form" (ngSubmit)="saveEmployee()" #empForm="ngForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" [(ngModel)]="form.firstName" name="firstName" required id="firstName" />
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input type="text" [(ngModel)]="form.lastName" name="lastName" required id="lastName" />
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" [(ngModel)]="form.email" name="email" required id="empEmail" />
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" [(ngModel)]="form.phone" name="phone" id="empPhone" />
+          </div>
+          <div class="form-group">
+            <label>Employee ID *</label>
+            <input type="text" [(ngModel)]="form.employeeId" name="employeeId" required id="employeeId" />
+          </div>
+          <div class="form-group">
+            <label>Joining Date</label>
+            <input type="date" [(ngModel)]="form.joiningDate" name="joiningDate" id="joiningDate" />
+          </div>
+          <div class="form-group">
+            <label>Department *</label>
+            <select [(ngModel)]="form.departmentId" name="departmentId" id="empDept" required>
+              <option [ngValue]="null" disabled>Select Department</option>
+              <option *ngFor="let d of departments" [ngValue]="d.id">{{ d.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Salary (₹)</label>
+            <input type="number" [(ngModel)]="form.salary" name="salary" id="empSalary" min="0" />
+          </div>
+          <div class="form-group form-group--full">
+            <label>Designation *</label>
+            <input type="text" [(ngModel)]="form.designation" name="designation" required id="designation" />
+          </div>
+          <div class="form-group form-group--full">
+            <label>Address</label>
+            <input type="text" [(ngModel)]="form.address" name="address" id="address" />
+          </div>
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="save-employee-btn" [disabled]="empForm.invalid">
+            {{ isEditMode ? 'Save Changes' : 'Create Employee' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

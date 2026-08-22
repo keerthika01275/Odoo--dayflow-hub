@@ -1,0 +1,139 @@
+<div class="leaves-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        <span class="material-icons">event_available</span>
+        Leave Requests
+      </h1>
+      <p class="page-subtitle">Review and manage employee leave applications</p>
+    </div>
+  </div>
+
+  <!-- Summary Stats -->
+  <div class="stats-row">
+    <div class="stat-card stat-card--pending" (click)="activeTab = 'PENDING'" [class.active]="activeTab === 'PENDING'">
+      <span class="material-icons">pending</span>
+      <div>
+        <div class="stat-value">{{ pendingCount }}</div>
+        <div class="stat-label">Pending</div>
+      </div>
+    </div>
+    <div class="stat-card stat-card--approved" (click)="activeTab = 'APPROVED'" [class.active]="activeTab === 'APPROVED'">
+      <span class="material-icons">check_circle</span>
+      <div>
+        <div class="stat-value">{{ approvedCount }}</div>
+        <div class="stat-label">Approved</div>
+      </div>
+    </div>
+    <div class="stat-card stat-card--rejected" (click)="activeTab = 'REJECTED'" [class.active]="activeTab === 'REJECTED'">
+      <span class="material-icons">cancel</span>
+      <div>
+        <div class="stat-value">{{ rejectedCount }}</div>
+        <div class="stat-label">Rejected</div>
+      </div>
+    </div>
+    <div class="stat-card stat-card--total">
+      <span class="material-icons">folder_open</span>
+      <div>
+        <div class="stat-value">{{ allLeaves.length }}</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-nav">
+    <button class="tab-btn" [class.active]="activeTab === 'PENDING'" (click)="activeTab = 'PENDING'" id="tab-pending">
+      <span class="material-icons">pending</span>
+      Pending
+      <span class="tab-count" *ngIf="pendingCount > 0">{{ pendingCount }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'APPROVED'" (click)="activeTab = 'APPROVED'" id="tab-approved">
+      <span class="material-icons">check_circle</span>
+      Approved
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'REJECTED'" (click)="activeTab = 'REJECTED'" id="tab-rejected">
+      <span class="material-icons">cancel</span>
+      Rejected
+    </button>
+  </div>
+
+  <!-- Leave Cards -->
+  <div class="leave-grid">
+    <div class="empty-state" *ngIf="filteredLeaves.length === 0">
+      <span class="material-icons">event_busy</span>
+      <h3>No {{ activeTab.toLowerCase() }} leave requests</h3>
+      <p>All {{ activeTab.toLowerCase() }} requests will appear here.</p>
+    </div>
+
+    <div class="leave-card" *ngFor="let leave of filteredLeaves">
+      <div class="leave-card__header">
+        <div class="employee-info">
+          <div class="avatar">
+            {{ (leave.employee?.firstName || 'E').charAt(0).toUpperCase() }}
+          </div>
+          <div>
+            <div class="employee-name">{{ getEmployeeName(leave) }}</div>
+            <div class="employee-id">{{ leave.employee?.employeeId || '' }}</div>
+          </div>
+        </div>
+        <span class="leave-type-badge" [ngClass]="getLeaveTypeClass(leave.leaveType)">
+          {{ leave.leaveType }}
+        </span>
+      </div>
+
+      <div class="leave-card__body">
+        <div class="date-range">
+          <span class="material-icons">date_range</span>
+          <span>{{ leave.startDate | date:'MMM d' }} — {{ leave.endDate | date:'MMM d, y' }}</span>
+          <span class="days-badge">{{ getLeaveDays(leave.startDate, leave.endDate) }} day(s)</span>
+        </div>
+
+        <div class="reason-box">
+          <span class="material-icons">notes</span>
+          <p>{{ leave.reason || 'No reason provided.' }}</p>
+        </div>
+
+        <div class="applied-on" *ngIf="leave.createdAt">
+          Applied on {{ leave.createdAt | date:'MMM d, y' }}
+        </div>
+
+        <div class="review-comment" *ngIf="leave.reviewComment">
+          <span class="material-icons">comment</span>
+          HR Comment: {{ leave.reviewComment }}
+        </div>
+      </div>
+
+      <div class="leave-card__actions" *ngIf="activeTab === 'PENDING'">
+        <input
+          type="text"
+          class="comment-input"
+          [(ngModel)]="reviewComment[leave.id]"
+          placeholder="Add a comment (optional)"
+          [id]="'comment-' + leave.id"
+        />
+        <div class="action-btns">
+          <button
+            class="btn btn--approve"
+            [id]="'approve-' + leave.id"
+            (click)="approve(leave)"
+            [disabled]="isProcessing[leave.id]"
+          >
+            <span class="material-icons">check</span>
+            {{ isProcessing[leave.id] ? 'Processing...' : 'Approve' }}
+          </button>
+          <button
+            class="btn btn--reject"
+            [id]="'reject-' + leave.id"
+            (click)="reject(leave)"
+            [disabled]="isProcessing[leave.id]"
+          >
+            <span class="material-icons">close</span>
+            {{ isProcessing[leave.id] ? 'Processing...' : 'Reject' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

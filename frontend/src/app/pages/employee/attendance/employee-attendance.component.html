@@ -1,0 +1,123 @@
+<div class="att-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        <span class="material-icons">schedule</span>
+        My Attendance
+      </h1>
+      <p class="page-subtitle">Track your daily check-in/out with GPS verification</p>
+    </div>
+  </div>
+
+  <!-- Location Alert -->
+  <div class="location-alert" *ngIf="locationError">
+    <span class="material-icons">location_off</span>
+    {{ locationError }}
+  </div>
+
+  <!-- Today's Card -->
+  <div class="today-card">
+    <div class="today-card__left">
+      <div class="today-status-ring" [ngClass]="'ring--' + todayStatus">
+        <span class="material-icons">
+          {{ checkedOutToday ? 'task_alt' : checkedInToday ? 'login' : 'access_time' }}
+        </span>
+      </div>
+      <div>
+        <h2 class="today-label">Today's Status</h2>
+        <p class="today-date">{{ today | date:'EEEE, MMMM d, y' }}</p>
+        <div class="today-times" *ngIf="todayRecord">
+          <span class="time-chip time-chip--in">
+            <span class="material-icons">login</span>
+            In: {{ formatDateTime(todayRecord.checkIn) }}
+          </span>
+          <span class="time-chip time-chip--out" *ngIf="todayRecord.checkOut">
+            <span class="material-icons">logout</span>
+            Out: {{ formatDateTime(todayRecord.checkOut) }}
+          </span>
+        </div>
+        <p class="no-record" *ngIf="!todayRecord">Not yet checked in today</p>
+      </div>
+    </div>
+
+    <div class="today-card__right">
+      <!-- GPS Location Indicator -->
+      <div class="gps-indicator" [class.gps-indicator--active]="currentLocation">
+        <span class="material-icons">{{ currentLocation ? 'gps_fixed' : 'gps_not_fixed' }}</span>
+        <span>{{ currentLocation ? 'GPS Ready (' + (currentLocation.lat | number:'1.4-4') + ', ' + (currentLocation.lng | number:'1.4-4') + ')' : 'Acquiring GPS...' }}</span>
+      </div>
+
+      <div class="action-buttons">
+        <button
+          class="checkin-btn"
+          id="check-in-btn"
+          (click)="checkIn()"
+          [disabled]="checkedInToday || isCheckingIn || !currentLocation"
+        >
+          <span class="material-icons">{{ isCheckingIn ? 'hourglass_empty' : 'login' }}</span>
+          {{ isCheckingIn ? 'Checking In...' : 'Check In' }}
+        </button>
+
+        <button
+          class="checkout-btn"
+          id="check-out-btn"
+          (click)="checkOut()"
+          [disabled]="!checkedInToday || checkedOutToday || isCheckingOut || !currentLocation"
+        >
+          <span class="material-icons">{{ isCheckingOut ? 'hourglass_empty' : 'logout' }}</span>
+          {{ isCheckingOut ? 'Checking Out...' : 'Check Out' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Table -->
+  <div class="section-header">
+    <h2>Attendance History</h2>
+    <span class="record-count">{{ attendanceHistory.length }} records</span>
+  </div>
+
+  <div class="table-card">
+    <div class="loading-row" *ngIf="isLoading">
+      <span class="material-icons spin">refresh</span>
+      Loading history...
+    </div>
+
+    <div class="table-wrapper" *ngIf="!isLoading">
+      <table class="att-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Status</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="attendanceHistory.length === 0">
+            <td colspan="5" class="empty-row">
+              <span class="material-icons">event_busy</span>
+              No attendance records found
+            </td>
+          </tr>
+          <tr *ngFor="let att of attendanceHistory">
+            <td class="date-cell">
+              <span class="material-icons">calendar_today</span>
+              {{ att.date | date:'MMM d, y' }}
+            </td>
+            <td class="time-cell in">{{ formatDateTime(att.checkIn) }}</td>
+            <td class="time-cell out">{{ formatDateTime(att.checkOut) }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(att.status)">
+                {{ att.status?.replace('_', ' ') }}
+              </span>
+            </td>
+            <td class="notes-cell">{{ att.remarks || '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

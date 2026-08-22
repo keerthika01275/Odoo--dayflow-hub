@@ -1,0 +1,111 @@
+<div class="payroll-page">
+  <div class="page-header">
+    <h1 class="page-title">
+      <span class="material-icons">payments</span>
+      My Payroll
+    </h1>
+    <p class="page-subtitle">Your current salary structure and compensation details</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <span class="material-icons spin">refresh</span>
+    Loading your payroll data...
+  </div>
+
+  <!-- No Data -->
+  <div class="empty-state" *ngIf="!isLoading && !payroll">
+    <span class="material-icons">receipt_long</span>
+    <h3>No Payroll Record Found</h3>
+    <p>Your payroll record hasn't been configured yet. Please contact HR.</p>
+  </div>
+
+  <!-- Payroll Card -->
+  <div class="payroll-content" *ngIf="payroll">
+    <!-- Hero Net Salary Card -->
+    <div class="net-card">
+      <div class="net-card__left">
+        <div class="net-label">Net Monthly Salary</div>
+        <div class="net-amount">{{ formatCurrency(payroll.netSalary) }}</div>
+        <div class="net-emp">{{ payroll.employee?.firstName }} {{ payroll.employee?.lastName }} · {{ payroll.employee?.employeeId }}</div>
+      </div>
+      <div class="net-card__icon">
+        <span class="material-icons">account_balance_wallet</span>
+      </div>
+    </div>
+
+    <!-- Breakdown -->
+    <div class="breakdown-grid">
+      <div class="breakdown-card breakdown-card--basic">
+        <div class="breakdown-icon">
+          <span class="material-icons">work</span>
+        </div>
+        <div class="breakdown-info">
+          <div class="breakdown-label">Basic Salary</div>
+          <div class="breakdown-amount">{{ formatCurrency(payroll.basicSalary) }}</div>
+          <div class="breakdown-desc">Base compensation</div>
+        </div>
+      </div>
+
+      <div class="breakdown-card breakdown-card--allowance">
+        <div class="breakdown-icon">
+          <span class="material-icons">add_circle</span>
+        </div>
+        <div class="breakdown-info">
+          <div class="breakdown-label">Total Allowances</div>
+          <div class="breakdown-amount">+{{ formatCurrency(totalAllowances) }}</div>
+          <div class="breakdown-desc">
+            HRA {{ formatCurrency(payroll.housingAllowance) }} · Transport {{ formatCurrency(payroll.transportAllowance) }} · Others {{ formatCurrency(payroll.otherAllowance) }}
+          </div>
+        </div>
+      </div>
+
+      <div class="breakdown-card breakdown-card--deduction">
+        <div class="breakdown-icon">
+          <span class="material-icons">remove_circle</span>
+        </div>
+        <div class="breakdown-info">
+          <div class="breakdown-label">Deductions</div>
+          <div class="breakdown-amount">-{{ formatCurrency(payroll.deductions) }}</div>
+          <div class="breakdown-desc">PF, tax, others</div>
+        </div>
+      </div>
+
+      <div class="breakdown-card breakdown-card--net">
+        <div class="breakdown-icon">
+          <span class="material-icons">calculate</span>
+        </div>
+        <div class="breakdown-info">
+          <div class="breakdown-label">Net Pay</div>
+          <div class="breakdown-amount">{{ formatCurrency(payroll.netSalary) }}</div>
+          <div class="breakdown-desc">In-hand amount</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual Breakdown Bar -->
+    <div class="salary-bar-card">
+      <h3>Salary Composition</h3>
+      <div class="salary-bar">
+        <div class="bar-segment bar-segment--basic"
+          [style.width.%]="basicPercent"
+          [title]="'Basic: ' + formatCurrency(payroll.basicSalary)">
+        </div>
+        <div class="bar-segment bar-segment--allowance"
+          [style.width.%]="100 - basicPercent"
+          [title]="'Allowances: ' + formatCurrency(totalAllowances)">
+        </div>
+      </div>
+      <div class="bar-legend">
+        <div class="legend-item"><span class="dot dot--basic"></span>Basic ({{ basicPercent }}%)</div>
+        <div class="legend-item"><span class="dot dot--allow"></span>Allowances ({{ 100 - basicPercent }}%)</div>
+      </div>
+    </div>
+
+    <!-- Effective Date -->
+    <div class="payroll-note">
+      <span class="material-icons">info</span>
+      <p>Effective from {{ payroll.effectiveFrom | date:'MMMM d, y' }}. Salary is credited on the last working day of each month. For discrepancies, contact HR.</p>
+    </div>
+  </div>
+</div>

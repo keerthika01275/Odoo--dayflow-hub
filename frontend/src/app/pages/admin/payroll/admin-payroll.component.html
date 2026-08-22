@@ -1,0 +1,162 @@
+<div class="payroll-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        <span class="material-icons">payments</span>
+        Payroll Management
+      </h1>
+      <p class="page-subtitle">Manage employee salary structures and compensation</p>
+    </div>
+    <div class="total-payroll">
+      <span class="material-icons">account_balance</span>
+      <div>
+        <div class="total-label">Monthly Payroll</div>
+        <div class="total-value">{{ formatCurrency(totalPayroll) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Search employee..."
+        [(ngModel)]="searchQuery"
+        id="payroll-search"
+      />
+    </div>
+    <div class="record-count">{{ filteredPayroll.length }} records</div>
+  </div>
+
+  <!-- Payroll Table -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table class="payroll-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>ID</th>
+            <th>Basic Salary</th>
+            <th>Allowances</th>
+            <th>Deductions</th>
+            <th>Net Salary</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredPayroll.length === 0">
+            <td colspan="7" class="empty-row">
+              <span class="material-icons">receipt_long</span>
+              No payroll records found
+            </td>
+          </tr>
+          <tr *ngFor="let p of filteredPayroll" class="payroll-row">
+            <td class="emp-cell">
+              <div class="avatar">{{ (p.employee?.firstName || 'E').charAt(0) }}</div>
+              <div>
+                <div class="emp-name">{{ getEmployeeName(p) }}</div>
+                <div class="emp-dept">{{ p.employee?.department?.name || '' }}</div>
+              </div>
+            </td>
+            <td><span class="id-badge">{{ p.employee?.employeeId }}</span></td>
+            <td class="amount-cell basic">{{ formatCurrency(p.basicSalary) }}</td>
+            <td class="amount-cell allow">
+              <span class="plus-badge">+{{ formatCurrency(getTotalAllowances(p)) }}</span>
+            </td>
+            <td class="amount-cell deduct">
+              <span class="minus-badge">-{{ formatCurrency(p.deductions) }}</span>
+            </td>
+            <td class="amount-cell net">
+              <span class="net-salary">{{ formatCurrency(p.netSalary) }}</span>
+            </td>
+            <td>
+              <button class="icon-btn" [id]="'edit-payroll-' + p.employee?.employeeId" (click)="openEdit(p)">
+                <span class="material-icons">edit</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <div class="modal__title-group">
+          <div class="modal-avatar">{{ (selectedPayroll?.employee?.firstName || 'E').charAt(0) }}</div>
+          <div>
+            <h3>Edit Payroll</h3>
+            <p class="modal-emp-name">{{ getEmployeeName(selectedPayroll!) }} · {{ selectedPayroll?.employee?.employeeId }}</p>
+          </div>
+        </div>
+        <button class="modal__close" (click)="closeModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <div class="salary-fields">
+          <div class="form-group">
+            <label>Basic Salary (₹)</label>
+            <div class="input-with-icon">
+              <span class="currency-sign">₹</span>
+              <input type="number" [(ngModel)]="form.basicSalary" id="basicSalary" min="0" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Housing Allowance (₹)</label>
+            <div class="input-with-icon input-with-icon--plus">
+              <span class="currency-sign">+</span>
+              <input type="number" [(ngModel)]="form.housingAllowance" id="housingAllowance" min="0" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Transport Allowance (₹)</label>
+            <div class="input-with-icon input-with-icon--plus">
+              <span class="currency-sign">+</span>
+              <input type="number" [(ngModel)]="form.transportAllowance" id="transportAllowance" min="0" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Other Allowance (₹)</label>
+            <div class="input-with-icon input-with-icon--plus">
+              <span class="currency-sign">+</span>
+              <input type="number" [(ngModel)]="form.otherAllowance" id="otherAllowance" min="0" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Deductions (₹)</label>
+            <div class="input-with-icon input-with-icon--minus">
+              <span class="currency-sign">-</span>
+              <input type="number" [(ngModel)]="form.deductions" id="deductions" min="0" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Net Salary Preview -->
+        <div class="net-preview">
+          <span class="material-icons">calculate</span>
+          <div>
+            <div class="net-formula">
+              Basic + Housing + Transport + Other − Deductions
+            </div>
+            <div class="net-result">Net Salary: <strong>{{ formatCurrency(previewNet) }}</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--ghost" (click)="closeModal()">Cancel</button>
+        <button class="btn btn--primary" id="save-payroll-btn" (click)="savePayroll()" [disabled]="isSaving">
+          <span class="material-icons">save</span>
+          {{ isSaving ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

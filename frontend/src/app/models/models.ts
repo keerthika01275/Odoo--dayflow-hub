@@ -19,6 +19,13 @@ export interface LoginResponse {
   lastName: string;
 }
 
+export interface DepartmentResponse {
+  id: number;
+  name: string;
+  description: string;
+  managerName?: string;
+}
+
 export interface Employee {
   id: number;
   employeeId: string;
@@ -27,37 +34,41 @@ export interface Employee {
   email: string;
   phone: string;
   address: string;
-  department: Department;
+  department?: DepartmentResponse;
   designation: string;
   joiningDate: string;
   salary: number;
-  profilePicture: string;
+  profilePicture?: string;
   status: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Department {
   id: number;
   name: string;
   description: string;
-  status: string;
+  managerName?: string;
 }
 
+// Backend Attendance entity shape (returned directly as JSON)
 export interface Attendance {
   id: number;
   employee: Employee;
   date: string;
-  checkIn: string;
-  checkOut: string;
-  checkInLatitude: number;
-  checkInLongitude: number;
-  checkOutLatitude: number;
-  checkOutLongitude: number;
+  checkIn: string | null;        // LocalDateTime → serialized as array or string
+  checkOut: string | null;
+  checkInLatitude: number | null;
+  checkInLongitude: number | null;
+  checkOutLatitude: number | null;
+  checkOutLongitude: number | null;
   status: string;
-  remarks: string;
+  remarks: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
+// Backend LeaveRequest entity shape
 export interface LeaveRequest {
   id: number;
   employee: Employee;
@@ -66,11 +77,13 @@ export interface LeaveRequest {
   endDate: string;
   reason: string;
   status: string;
-  reviewedBy: string;
-  reviewComment: string;
-  createdAt: string;
+  reviewedBy: string | null;
+  reviewComment: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
+// Backend Payroll entity shape
 export interface Payroll {
   id: number;
   employee: Employee;
@@ -81,6 +94,7 @@ export interface Payroll {
   deductions: number;
   netSalary: number;
   effectiveFrom: string;
+  updatedAt?: string;
 }
 
 export interface ErrorResponse {
@@ -89,3 +103,4 @@ export interface ErrorResponse {
   timestamp: string;
   errors?: { [key: string]: string };
 }
+
