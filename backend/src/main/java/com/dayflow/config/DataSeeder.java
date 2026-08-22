@@ -44,9 +44,9 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (departmentRepository.count() == 0) seedDepartments();
-        if (employeeRepository.count() == 0) seedEmployees();
-        if (userRepository.count() == 0) seedUsers();
+        seedDepartments();
+        seedEmployees();
+        seedUsers();
         if (attendanceRepository.count() == 0) seedAttendance();
         if (leaveRepository.count() == 0) seedLeaveRequests();
         if (payrollRepository.count() == 0) seedPayroll();
@@ -61,8 +61,12 @@ public class DataSeeder implements CommandLineRunner {
             Department.builder().name("Sales").description("Manages customer relations and sales operations").status("ACTIVE").build(),
             Department.builder().name("Operations").description("Manages daily business operations and logistics").status("ACTIVE").build()
         );
-        departmentRepository.saveAll(departments);
-        log.info("✓ Seeded {} departments", departments.size());
+        for (Department d : departments) {
+            if (!departmentRepository.existsByName(d.getName())) {
+                departmentRepository.save(d);
+            }
+        }
+        log.info("✓ Verified department seeding");
     }
 
     private void seedEmployees() {
@@ -75,7 +79,7 @@ public class DataSeeder implements CommandLineRunner {
 
         if (it == null || hr == null) { log.warn("Departments missing, skipping employee seeding"); return; }
 
-        employeeRepository.saveAll(List.of(
+        List<Employee> defaultEmployees = List.of(
             Employee.builder().employeeId("EMP000").firstName("System").lastName("Admin")
                 .email("admin@dayflow.com").phone("+91 99999 00000").address("Dayflow HQ, Coimbatore, Tamil Nadu")
                 .department(it).designation("System Administrator").joiningDate(LocalDate.of(2020, 1, 1))
@@ -110,8 +114,14 @@ public class DataSeeder implements CommandLineRunner {
                 .email("suresh@dayflow.com").phone("+91 54321 55555").address("33, Singanallur, Coimbatore, Tamil Nadu")
                 .department(ops).designation("Operations Analyst").joiningDate(LocalDate.of(2022, 4, 5))
                 .salary(new BigDecimal("60000")).status(EmployeeStatus.ACTIVE).build()
-        ));
-        log.info("✓ Seeded 7 employees");
+        );
+
+        for (Employee e : defaultEmployees) {
+            if (!employeeRepository.existsByEmployeeId(e.getEmployeeId())) {
+                employeeRepository.save(e);
+            }
+        }
+        log.info("✓ Verified employee seeding");
     }
 
     private void seedUsers() {
@@ -119,46 +129,35 @@ public class DataSeeder implements CommandLineRunner {
         String hrPass    = passwordEncoder.encode("Priya@123");
         String empPass   = passwordEncoder.encode("Rahul@123");
 
-        userRepository.saveAll(List.of(
-            // ADMIN account
-            User.builder().employeeId("EMP000").email("admin@dayflow.com")
-                .passwordHash(adminPass).role(Role.ADMIN)
-                .emailVerified(true).accountStatus(AccountStatus.ACTIVE).build(),
+        upsertUser("EMP000", "admin@dayflow.com", adminPass, Role.ADMIN);
+        upsertUser("EMP001", "priya@dayflow.com", hrPass, Role.HR);
+        upsertUser("EMP002", "rahul@dayflow.com", empPass, Role.EMPLOYEE);
+        upsertUser("EMP003", "anitha@dayflow.com", passwordEncoder.encode("Anitha@123"), Role.EMPLOYEE);
+        upsertUser("EMP004", "deepak@dayflow.com", passwordEncoder.encode("Deepak@123"), Role.EMPLOYEE);
+        upsertUser("EMP005", "kavitha@dayflow.com", passwordEncoder.encode("Kavitha@123"), Role.EMPLOYEE);
+        upsertUser("EMP006", "suresh@dayflow.com", passwordEncoder.encode("Suresh@123"), Role.EMPLOYEE);
 
-            // HR account
-            User.builder().employeeId("EMP001").email("priya@dayflow.com")
-                .passwordHash(hrPass).role(Role.HR)
-                .emailVerified(true).accountStatus(AccountStatus.ACTIVE).build(),
-
-            // EMPLOYEE accounts
-            User.builder().employeeId("EMP002").email("rahul@dayflow.com")
-                .passwordHash(empPass).role(Role.EMPLOYEE)
-                .emailVerified(true).accountStatus(AccountStatus.ACTIVE).build(),
-
-            User.builder().employeeId("EMP003").email("anitha@dayflow.com")
-                .passwordHash(passwordEncoder.encode("Anitha@123")).role(Role.EMPLOYEE)
-                .emailVerified(true).accountStatus(AccountStatus.ACTIVE).build(),
-
-            User.builder().employeeId("EMP004").email("deepak@dayflow.com")
-                .passwordHash(passwordEncoder.encode("Deepak@123")).role(Role.EMPLOYEE)
-                .emailVerified(true).accountStatus(AccountStatus.ACTIVE).build(),
-
-            User.builder().employeeId("EMP005").email("kavitha@dayflow.com")
-                .passwordHash(passwordEncoder.encode("Kavitha@123")).role(Role.EMPLOYEE)
-                .emailVerified(true).accountStatus(AccountStatus.ACTIVE).build(),
-
-            User.builder().employeeId("EMP006").email("suresh@dayflow.com")
-                .passwordHash(passwordEncoder.encode("Suresh@123")).role(Role.EMPLOYEE)
-                .emailVerified(true).accountStatus(AccountStatus.ACTIVE).build()
-        ));
-
-        log.info("✓ Seeded 7 user accounts");
+        log.info("✓ Verified 7 user accounts seeding");
         log.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         log.info("  DAYFLOW Demo Credentials:");
         log.info("  ADMIN    → admin@dayflow.com   / Admin@123");
         log.info("  HR       → priya@dayflow.com   / Priya@123");
         log.info("  EMPLOYEE → rahul@dayflow.com   / Rahul@123");
         log.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    }
+
+    private void upsertUser(String empId, String email, String passwordHash, Role role) {
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseGet(() -> userRepository.findByEmployeeId(empId)
+                .orElse(User.builder().employeeId(empId).email(email).build()));
+
+        user.setEmployeeId(empId);
+        user.setEmail(email);
+        user.setPasswordHash(passwordHash);
+        user.setRole(role);
+        user.setEmailVerified(true);
+        user.setAccountStatus(AccountStatus.ACTIVE);
+        userRepository.save(user);
     }
 
     private void seedAttendance() {
