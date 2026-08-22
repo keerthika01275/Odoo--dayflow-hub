@@ -4,7 +4,6 @@ services:
     name: dayflow-backend
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
     envVars:
       # Set these manually in Render dashboard using your Neon.tech credentials
       - key: DB_URL
