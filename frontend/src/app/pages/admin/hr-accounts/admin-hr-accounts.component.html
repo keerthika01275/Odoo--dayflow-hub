@@ -1,0 +1,172 @@
+<div class="hr-accounts-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        <span class="material-icons">manage_accounts</span>
+        HR Accounts Management
+      </h1>
+      <p class="page-subtitle">Provision system privileges and manage HR administrators</p>
+    </div>
+    <button class="btn btn--primary" id="create-hr-account-btn" (click)="openCreateModal()">
+      <span class="material-icons">person_add</span>
+      Provision HR Account
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--purple">
+        <span class="material-icons">verified_user</span>
+      </div>
+      <div>
+        <div class="stat-value">{{ hrEmployees.length }}</div>
+        <div class="stat-label">HR Representatives</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--blue">
+        <span class="material-icons">security</span>
+      </div>
+      <div>
+        <div class="stat-value">Active</div>
+        <div class="stat-label">Role Policy Enforcement</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Filter -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Search HR accounts by name, email, or ID..."
+        [(ngModel)]="searchQuery"
+        id="search-hr-accounts"
+      />
+    </div>
+    <div class="record-badge">{{ filteredHrList.length }} Accounts</div>
+  </div>
+
+  <!-- HR Accounts Table -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table class="account-table">
+        <thead>
+          <tr>
+            <th>HR Specialist</th>
+            <th>Employee ID</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Access Role</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredHrList.length === 0">
+            <td colspan="6" class="empty-row">
+              <span class="material-icons">no_accounts</span>
+              No HR accounts found
+            </td>
+          </tr>
+          <tr *ngFor="let hr of filteredHrList" class="account-row">
+            <td class="emp-cell">
+              <div class="avatar">{{ hr.firstName?.charAt(0) }}{{ hr.lastName?.charAt(0) }}</div>
+              <div>
+                <div class="emp-name">{{ hr.firstName }} {{ hr.lastName }}</div>
+                <div class="emp-email">{{ hr.email }}</div>
+              </div>
+            </td>
+            <td><span class="id-badge">{{ hr.employeeId }}</span></td>
+            <td>{{ hr.department?.name || 'Human Resources' }}</td>
+            <td>{{ hr.designation || 'HR Officer' }}</td>
+            <td>
+              <span class="role-badge">HR ADMIN</span>
+            </td>
+            <td>
+              <span class="status-badge status--active">ACTIVE</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Create HR Account Modal -->
+  <div class="modal-backdrop" *ngIf="showCreateModal" (click)="closeCreateModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3>Provision HR Account</h3>
+        <button class="modal__close" (click)="closeCreateModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <form (ngSubmit)="createHrAccount()" #hrForm="ngForm">
+        <div class="modal__body">
+          <div class="form-group">
+            <label>Select Employee *</label>
+            <select
+              [(ngModel)]="newAccountForm.employeeId"
+              (ngModelChange)="onEmployeeSelected($event)"
+              name="employeeId"
+              required
+              id="select-hr-emp"
+            >
+              <option value="" disabled>Select employee to grant HR access</option>
+              <option *ngFor="let emp of employees" [value]="emp.employeeId">
+                {{ emp.firstName }} {{ emp.lastName }} ({{ emp.employeeId }} - {{ emp.department?.name }})
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Official Email *</label>
+            <input
+              type="email"
+              [(ngModel)]="newAccountForm.email"
+              name="email"
+              required
+              readonly
+              id="hr-email-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Initial Password *</label>
+            <input
+              type="password"
+              [(ngModel)]="newAccountForm.password"
+              name="password"
+              required
+              id="hr-pwd-input"
+              placeholder="Minimum 6 characters"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Confirm Password *</label>
+            <input
+              type="password"
+              [(ngModel)]="newAccountForm.confirmPassword"
+              name="confirmPassword"
+              required
+              id="hr-cpwd-input"
+              placeholder="Confirm initial password"
+            />
+          </div>
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" (click)="closeCreateModal()">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="submit-hr-account-btn" [disabled]="hrForm.invalid || isSubmitting">
+            <span class="material-icons">person_add</span>
+            {{ isSubmitting ? 'Provisioning...' : 'Provision Account' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

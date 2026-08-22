@@ -1,0 +1,137 @@
+<div class="attendance-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        <span class="material-icons">{{ isExceptionsMode ? 'warning' : 'schedule' }}</span>
+        {{ isExceptionsMode ? 'Location Exceptions & Violations' : 'Workforce Attendance Log' }}
+      </h1>
+      <p class="page-subtitle">
+        {{ isExceptionsMode ? 'Audit GPS geofencing violations and remote check-ins' : 'Real-time clock-in/out records with GPS geofence validation' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Counters Row -->
+  <div class="stats-row" *ngIf="!isExceptionsMode">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--blue">
+        <span class="material-icons">event_available</span>
+      </div>
+      <div>
+        <div class="stat-value">{{ attendanceList.length }}</div>
+        <div class="stat-label">Total Logs Recorded</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--green">
+        <span class="material-icons">check_circle</span>
+      </div>
+      <div>
+        <div class="stat-value">{{ presentCount }}</div>
+        <div class="stat-label">Verified On-Site</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--red">
+        <span class="material-icons">fmd_bad</span>
+      </div>
+      <div>
+        <div class="stat-value">{{ exceptionCount }}</div>
+        <div class="stat-label">Location Exceptions</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Search by employee name or ID..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="applyFilter()"
+        id="search-attendance"
+      />
+    </div>
+
+    <div class="filter-controls">
+      <input
+        type="date"
+        [(ngModel)]="selectedDate"
+        (ngModelChange)="applyFilter()"
+        class="date-input"
+        id="filter-attendance-date"
+      />
+
+      <select
+        [(ngModel)]="filterStatus"
+        (ngModelChange)="applyFilter()"
+        class="status-select"
+        id="filter-attendance-status"
+        *ngIf="!isExceptionsMode"
+      >
+        <option value="ALL">All Statuses</option>
+        <option value="PRESENT">Present (On-Site)</option>
+        <option value="LOCATION_EXCEPTION">Location Exception</option>
+      </select>
+
+      <button class="btn btn--reset" (click)="searchQuery = ''; selectedDate = ''; filterStatus = 'ALL'; applyFilter()" title="Clear filters">
+        <span class="material-icons">refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Attendance Table -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table class="att-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Status</th>
+            <th>GPS Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredList.length === 0">
+            <td colspan="6" class="empty-row">
+              <span class="material-icons">event_busy</span>
+              No attendance records found matching filters
+            </td>
+          </tr>
+
+          <tr *ngFor="let att of filteredList" class="att-row">
+            <td class="emp-cell">
+              <div class="avatar">{{ att.employee?.firstName?.charAt(0) }}{{ att.employee?.lastName?.charAt(0) }}</div>
+              <div>
+                <div class="emp-name">{{ att.employee?.firstName }} {{ att.employee?.lastName }}</div>
+                <div class="emp-meta">{{ att.employee?.employeeId }} · {{ att.employee?.department?.name || 'Unassigned' }}</div>
+              </div>
+            </td>
+            <td class="date-cell">{{ att.date | date:'MMM d, y' }}</td>
+            <td class="time-cell time-cell--in">{{ formatTime(att.checkIn) }}</td>
+            <td class="time-cell time-cell--out">{{ formatTime(att.checkOut) }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(att.status)">
+                {{ att.status === 'LOCATION_EXCEPTION' ? 'Location Exception' : att.status }}
+              </span>
+            </td>
+            <td class="remarks-cell">
+              <div class="remarks-box" [class.remarks-box--warn]="att.status === 'LOCATION_EXCEPTION'">
+                <span class="material-icons">{{ att.status === 'LOCATION_EXCEPTION' ? 'fmd_bad' : 'fmd_good' }}</span>
+                <span>{{ att.remarks || 'GPS verified' }}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

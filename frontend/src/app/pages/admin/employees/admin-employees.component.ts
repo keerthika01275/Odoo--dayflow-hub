@@ -140,6 +140,37 @@ export class AdminEmployeesComponent implements OnInit {
     });
   }
 
+  exportToCsv(): void {
+    if (this.employees.length === 0) {
+      this.toast.info('No employee records available to export.');
+      return;
+    }
+
+    const headers = ['Employee ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Department', 'Designation', 'Joining Date', 'Status'];
+    const rows = this.employees.map(e => [
+      `"${e.employeeId || ''}"`,
+      `"${e.firstName || ''}"`,
+      `"${e.lastName || ''}"`,
+      `"${e.email || ''}"`,
+      `"${e.phone || ''}"`,
+      `"${e.department?.name || ''}"`,
+      `"${e.designation || ''}"`,
+      `"${e.joiningDate || ''}"`,
+      `"${e.status || 'ACTIVE'}"`
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `DAYFLOW_Workforce_Export_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    this.toast.success('Workforce roster exported to CSV successfully.');
+  }
+
   getStatusClass(status: string): string {
     const map: Record<string, string> = { ACTIVE: 'badge--active', INACTIVE: 'badge--inactive', TERMINATED: 'badge--terminated' };
     return map[status] || 'badge--active';

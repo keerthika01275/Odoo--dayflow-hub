@@ -22,6 +22,46 @@ export class MainLayoutComponent implements OnInit {
   role: string | null = null;
   navItems: NavItem[] = [];
   mobileMenuOpen = false;
+  notificationOpen = false;
+
+  notifications = [
+    {
+      id: 1,
+      title: 'GPS Geofencing Active',
+      message: 'Office perimeter set to 200m radius around premise coordinates.',
+      time: 'Just now',
+      icon: 'gps_fixed',
+      read: false
+    },
+    {
+      id: 2,
+      title: 'System Security Verified',
+      message: 'JWT session authenticated with active role permissions.',
+      time: '10m ago',
+      icon: 'verified_user',
+      read: false
+    },
+    {
+      id: 3,
+      title: 'Monthly Compensation Schedule',
+      message: 'Salary slips and disbursements processed on final business day.',
+      time: '1h ago',
+      icon: 'payments',
+      read: true
+    }
+  ];
+
+  get unreadCount(): number {
+    return this.notifications.filter(n => !n.read).length;
+  }
+
+  toggleNotificationMenu(): void {
+    this.notificationOpen = !this.notificationOpen;
+  }
+
+  markAllAsRead(): void {
+    this.notifications.forEach(n => n.read = true);
+  }
 
   constructor(
     private authService: AuthService,

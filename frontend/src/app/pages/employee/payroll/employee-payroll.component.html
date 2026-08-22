@@ -1,10 +1,17 @@
 <div class="payroll-page">
   <div class="page-header">
-    <h1 class="page-title">
-      <span class="material-icons">payments</span>
-      My Payroll
-    </h1>
-    <p class="page-subtitle">Your current salary structure and compensation details</p>
+    <div>
+      <h1 class="page-title">
+        <span class="material-icons">payments</span>
+        My Payroll & Payslips
+      </h1>
+      <p class="page-subtitle">Your current salary structure and monthly compensation statement</p>
+    </div>
+
+    <button class="btn btn--primary" id="view-payslip-btn" (click)="openPayslip()" *ngIf="payroll">
+      <span class="material-icons">receipt</span>
+      Download / Print Payslip
+    </button>
   </div>
 
   <!-- Loading -->
@@ -106,6 +113,114 @@
     <div class="payroll-note">
       <span class="material-icons">info</span>
       <p>Effective from {{ payroll.effectiveFrom | date:'MMMM d, y' }}. Salary is credited on the last working day of each month. For discrepancies, contact HR.</p>
+    </div>
+  </div>
+
+  <!-- Formal Printable Payslip Modal -->
+  <div class="modal-backdrop" *ngIf="showPayslipModal && payroll" (click)="closePayslip()">
+    <div class="modal modal--payslip" (click)="$event.stopPropagation()">
+      <div class="payslip-document" id="printable-payslip">
+        <div class="payslip-header">
+          <div class="company-brand">
+            <div class="company-logo">DAYFLOW</div>
+            <div class="company-sub">Enterprise Workforce Technologies</div>
+          </div>
+          <div class="payslip-meta">
+            <div class="payslip-title">SALARY SLIP</div>
+            <div class="payslip-period">{{ payroll.effectiveFrom | date:'MMMM y' }}</div>
+          </div>
+        </div>
+
+        <div class="payslip-divider"></div>
+
+        <div class="emp-summary-grid">
+          <div>
+            <div class="summary-label">Employee Name</div>
+            <div class="summary-val">{{ payroll.employee?.firstName }} {{ payroll.employee?.lastName }}</div>
+          </div>
+          <div>
+            <div class="summary-label">Employee ID</div>
+            <div class="summary-val">{{ payroll.employee?.employeeId }}</div>
+          </div>
+          <div>
+            <div class="summary-label">Department</div>
+            <div class="summary-val">{{ payroll.employee?.department?.name || 'Engineering' }}</div>
+          </div>
+          <div>
+            <div class="summary-label">Designation</div>
+            <div class="summary-val">{{ payroll.employee?.designation }}</div>
+          </div>
+        </div>
+
+        <div class="payslip-tables">
+          <table class="slip-table">
+            <thead>
+              <tr>
+                <th>Earnings</th>
+                <th class="text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Basic Salary</td>
+                <td class="text-right">{{ formatCurrency(payroll.basicSalary) }}</td>
+              </tr>
+              <tr>
+                <td>Housing Allowance (HRA)</td>
+                <td class="text-right">{{ formatCurrency(payroll.housingAllowance) }}</td>
+              </tr>
+              <tr>
+                <td>Transport Allowance</td>
+                <td class="text-right">{{ formatCurrency(payroll.transportAllowance) }}</td>
+              </tr>
+              <tr>
+                <td>Special / Other Allowance</td>
+                <td class="text-right">{{ formatCurrency(payroll.otherAllowance) }}</td>
+              </tr>
+              <tr class="total-row">
+                <td><strong>Total Gross Earnings</strong></td>
+                <td class="text-right"><strong>{{ formatCurrency(payroll.basicSalary + totalAllowances) }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class="slip-table">
+            <thead>
+              <tr>
+                <th>Deductions</th>
+                <th class="text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Provident Fund (PF) & Tax</td>
+                <td class="text-right">{{ formatCurrency(payroll.deductions) }}</td>
+              </tr>
+              <tr class="total-row">
+                <td><strong>Total Deductions</strong></td>
+                <td class="text-right"><strong>{{ formatCurrency(payroll.deductions) }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="net-pay-banner">
+          <span class="net-label">NET SALARY PAYABLE:</span>
+          <span class="net-value">{{ formatCurrency(payroll.netSalary) }}</span>
+        </div>
+
+        <div class="payslip-footer">
+          <small>This is a computer-generated official payslip from DAYFLOW HRMS. No physical signature required.</small>
+        </div>
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--ghost" (click)="closePayslip()">Close</button>
+        <button class="btn btn--primary" id="print-trigger-btn" (click)="printPayslip()">
+          <span class="material-icons">print</span>
+          Print / Save PDF
+        </button>
+      </div>
     </div>
   </div>
 </div>

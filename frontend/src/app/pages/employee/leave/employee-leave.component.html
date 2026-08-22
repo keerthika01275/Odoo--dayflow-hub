@@ -14,28 +14,39 @@
     </button>
   </div>
 
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <span class="material-icons" style="color: #FBBF24">pending</span>
-      <div>
-        <div class="stat-val">{{ pendingCount }}</div>
-        <div class="stat-lbl">Pending</div>
+  <!-- Leave Quotas Balance Tracker -->
+  <div class="quota-row">
+    <div class="quota-card quota--casual">
+      <div class="quota-header">
+        <span class="quota-title">Casual Leave</span>
+        <span class="quota-badge">{{ getRemainingDays('CASUAL') }}/{{ quotas['CASUAL'] }} left</span>
       </div>
+      <div class="quota-bar">
+        <div class="quota-fill" [style.width.%]="(getUsedDays('CASUAL') / quotas['CASUAL']) * 100"></div>
+      </div>
+      <div class="quota-footer">{{ getUsedDays('CASUAL') }} days utilized</div>
     </div>
-    <div class="stat-card">
-      <span class="material-icons" style="color: #4ADE80">check_circle</span>
-      <div>
-        <div class="stat-val">{{ approvedCount }}</div>
-        <div class="stat-lbl">Approved</div>
+
+    <div class="quota-card quota--sick">
+      <div class="quota-header">
+        <span class="quota-title">Sick Leave</span>
+        <span class="quota-badge">{{ getRemainingDays('SICK') }}/{{ quotas['SICK'] }} left</span>
       </div>
+      <div class="quota-bar">
+        <div class="quota-fill" [style.width.%]="(getUsedDays('SICK') / quotas['SICK']) * 100"></div>
+      </div>
+      <div class="quota-footer">{{ getUsedDays('SICK') }} days utilized</div>
     </div>
-    <div class="stat-card">
-      <span class="material-icons" style="color: #818CF8">folder_open</span>
-      <div>
-        <div class="stat-val">{{ myLeaves.length }}</div>
-        <div class="stat-lbl">Total Applied</div>
+
+    <div class="quota-card quota--earned">
+      <div class="quota-header">
+        <span class="quota-title">Earned Leave</span>
+        <span class="quota-badge">{{ getRemainingDays('EARNED') }}/{{ quotas['EARNED'] }} left</span>
       </div>
+      <div class="quota-bar">
+        <div class="quota-fill" [style.width.%]="(getUsedDays('EARNED') / quotas['EARNED']) * 100"></div>
+      </div>
+      <div class="quota-footer">{{ getUsedDays('EARNED') }} days utilized</div>
     </div>
   </div>
 

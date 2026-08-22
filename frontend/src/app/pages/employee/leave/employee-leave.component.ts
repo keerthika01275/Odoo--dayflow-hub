@@ -26,8 +26,26 @@ export class EmployeeLeaveComponent implements OnInit {
 
   leaveTypes = ['CASUAL', 'SICK', 'EARNED', 'MATERNITY', 'PATERNITY'];
 
+  // Standard Annual Quotas
+  quotas: Record<string, number> = {
+    CASUAL: 14,
+    SICK: 12,
+    EARNED: 20
+  };
+
   get pendingCount(): number { return this.myLeaves.filter(l => l.status === 'PENDING').length; }
   get approvedCount(): number { return this.myLeaves.filter(l => l.status === 'APPROVED').length; }
+
+  getUsedDays(type: string): number {
+    return this.myLeaves
+      .filter(l => l.leaveType === type && l.status === 'APPROVED')
+      .reduce((sum, l) => sum + this.getLeaveDays(l.startDate, l.endDate), 0);
+  }
+
+  getRemainingDays(type: string): number {
+    const total = this.quotas[type] || 10;
+    return Math.max(0, total - this.getUsedDays(type));
+  }
 
   constructor(
     private leaveService: LeaveService,

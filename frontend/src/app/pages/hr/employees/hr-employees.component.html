@@ -1,0 +1,143 @@
+<div class="hr-emp-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        <span class="material-icons">groups</span>
+        Employee Directory
+      </h1>
+      <p class="page-subtitle">View staff directory, department allocations, and personal records</p>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Search by name, role, email, or employee ID..."
+        [(ngModel)]="searchQuery"
+        id="search-hr-employees"
+      />
+    </div>
+
+    <div class="filter-controls">
+      <select [(ngModel)]="filterDept" id="filter-hr-dept" class="filter-select">
+        <option value="">All Departments</option>
+        <option *ngFor="let d of departments" [value]="d.id">{{ d.name }}</option>
+      </select>
+
+      <div class="record-badge">{{ filteredEmployees.length }} Employees</div>
+    </div>
+  </div>
+
+  <!-- Employees Cards Grid -->
+  <div class="employees-grid">
+    <div class="empty-state" *ngIf="filteredEmployees.length === 0">
+      <span class="material-icons">person_search</span>
+      <h3>No employees found</h3>
+      <p>Try adjusting your search query or department filter.</p>
+    </div>
+
+    <div class="emp-card" *ngFor="let emp of filteredEmployees" (click)="viewDetails(emp)">
+      <div class="emp-card__top">
+        <div class="avatar">{{ getInitials(emp) }}</div>
+        <span class="status-badge" [class.status--active]="emp.status === 'ACTIVE'">
+          {{ emp.status }}
+        </span>
+      </div>
+
+      <div class="emp-card__body">
+        <h3 class="emp-name">{{ emp.firstName }} {{ emp.lastName }}</h3>
+        <p class="emp-role">{{ emp.designation || 'Staff Member' }}</p>
+
+        <div class="emp-meta-list">
+          <div class="meta-item">
+            <span class="material-icons">badge</span>
+            <span>{{ emp.employeeId }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="material-icons">domain</span>
+            <span>{{ emp.department?.name || 'Unassigned' }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="material-icons">email</span>
+            <span class="text-truncate">{{ emp.email }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="emp-card__footer">
+        <button class="btn btn--details" (click)="viewDetails(emp); $event.stopPropagation()">
+          <span class="material-icons">visibility</span>
+          View Full Profile
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Detail Modal -->
+  <div class="modal-backdrop" *ngIf="showDetailModal && selectedEmployee" (click)="closeDetails()">
+    <div class="modal modal--detail" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <div class="modal-emp-header">
+          <div class="avatar avatar--large">{{ getInitials(selectedEmployee) }}</div>
+          <div>
+            <h3>{{ selectedEmployee.firstName }} {{ selectedEmployee.lastName }}</h3>
+            <p class="modal-subtitle">{{ selectedEmployee.designation }} · {{ selectedEmployee.employeeId }}</p>
+          </div>
+        </div>
+        <button class="modal__close" (click)="closeDetails()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <div class="detail-grid">
+          <div class="detail-section">
+            <h4><span class="material-icons">contact_page</span> Contact Information</h4>
+            <div class="detail-row">
+              <span class="detail-label">Email:</span>
+              <span class="detail-val">{{ selectedEmployee.email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Phone:</span>
+              <span class="detail-val">{{ selectedEmployee.phone || '—' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Address:</span>
+              <span class="detail-val">{{ selectedEmployee.address || '—' }}</span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4><span class="material-icons">work</span> Employment Details</h4>
+            <div class="detail-row">
+              <span class="detail-label">Department:</span>
+              <span class="detail-val">{{ selectedEmployee.department?.name || 'Unassigned' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Designation:</span>
+              <span class="detail-val">{{ selectedEmployee.designation || '—' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Joining Date:</span>
+              <span class="detail-val">{{ selectedEmployee.joiningDate | date:'MMMM d, y' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Status:</span>
+              <span class="detail-val">
+                <span class="status-badge" [class.status--active]="selectedEmployee.status === 'ACTIVE'">{{ selectedEmployee.status }}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--primary" (click)="closeDetails()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -40,6 +40,20 @@ export class EmployeePayrollComponent implements OnInit {
     return Math.round((basic / total) * 100);
   }
 
+  showPayslipModal = false;
+
+  openPayslip(): void {
+    this.showPayslipModal = true;
+  }
+
+  closePayslip(): void {
+    this.showPayslipModal = false;
+  }
+
+  printPayslip(): void {
+    window.print();
+  }
+
   formatCurrency(val: number): string {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val || 0);
   }

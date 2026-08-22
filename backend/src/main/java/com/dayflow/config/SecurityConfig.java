@@ -62,11 +62,13 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
                 .requestMatchers("/api/health", "/api/auth/**", "/h2-console/**").permitAll()
-                // Admin-only
+                // Employee self-service
+                .requestMatchers("/api/employees/me").authenticated()
+                .requestMatchers("/api/departments", "/api/departments/**").hasAnyRole("ADMIN", "HR", "EMPLOYEE")
+                // Admin & HR management
                 .requestMatchers("/api/employees/**").hasAnyRole("ADMIN", "HR")
-                .requestMatchers("/api/departments/**").hasAnyRole("ADMIN", "HR")
-                // HR and above
-                .requestMatchers("/api/attendance/all", "/api/attendance/employee/**").hasAnyRole("ADMIN", "HR")
+                // Attendance
+                .requestMatchers("/api/attendance/all", "/api/attendance/employee/**", "/api/attendance/exceptions").hasAnyRole("ADMIN", "HR")
                 .requestMatchers("/api/leaves/all", "/api/leaves/*/approve", "/api/leaves/*/reject").hasAnyRole("ADMIN", "HR")
                 .requestMatchers("/api/payroll/all", "/api/payroll/update/**").hasRole("ADMIN")
                 // Authenticated users

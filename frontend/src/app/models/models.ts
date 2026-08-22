@@ -23,7 +23,8 @@ export interface DepartmentResponse {
   id: number;
   name: string;
   description: string;
-  managerName?: string;
+  status?: string;
+  employeeCount?: number;
 }
 
 export interface Employee {
@@ -48,7 +49,8 @@ export interface Department {
   id: number;
   name: string;
   description: string;
-  managerName?: string;
+  status?: string;
+  employeeCount?: number;
 }
 
 // Backend Attendance entity shape (returned directly as JSON)

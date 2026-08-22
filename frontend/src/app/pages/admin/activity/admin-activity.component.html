@@ -1,0 +1,67 @@
+<div class="activity-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        <span class="material-icons">history</span>
+        System Audit & Activity Trail
+      </h1>
+      <p class="page-subtitle">Security log, privilege mutations, and enterprise transaction history</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Filter logs by actor, action, or details..."
+        [(ngModel)]="searchQuery"
+        id="search-activity-logs"
+      />
+    </div>
+
+    <div class="category-chips">
+      <button class="chip" [class.active]="filterCategory === 'ALL'" (click)="filterCategory = 'ALL'">All Events</button>
+      <button class="chip" [class.active]="filterCategory === 'AUTH'" (click)="filterCategory = 'AUTH'">Security</button>
+      <button class="chip" [class.active]="filterCategory === 'WORKFORCE'" (click)="filterCategory = 'WORKFORCE'">Workforce</button>
+      <button class="chip" [class.active]="filterCategory === 'LEAVE'" (click)="filterCategory = 'LEAVE'">Leaves</button>
+      <button class="chip" [class.active]="filterCategory === 'PAYROLL'" (click)="filterCategory = 'PAYROLL'">Payroll</button>
+      <button class="chip" [class.active]="filterCategory === 'SYSTEM'" (click)="filterCategory = 'SYSTEM'">System</button>
+    </div>
+  </div>
+
+  <!-- Activity Timeline -->
+  <div class="activity-card">
+    <div class="timeline">
+      <div class="timeline-item" *ngFor="let log of filteredLogs">
+        <div class="timeline-dot" [ngClass]="getCategoryBadgeClass(log.category)">
+          <span class="material-icons">
+            {{ log.category === 'AUTH' ? 'lock' : log.category === 'LEAVE' ? 'event' : log.category === 'PAYROLL' ? 'payments' : log.category === 'WORKFORCE' ? 'person' : 'terminal' }}
+          </span>
+        </div>
+
+        <div class="timeline-content">
+          <div class="timeline-header">
+            <div>
+              <span class="log-action">{{ log.action }}</span>
+              <span class="log-category-badge" [ngClass]="getCategoryBadgeClass(log.category)">{{ log.category }}</span>
+            </div>
+            <span class="log-time">{{ log.timestamp }}</span>
+          </div>
+
+          <p class="log-details">{{ log.details }}</p>
+
+          <div class="log-footer">
+            <span class="log-actor">
+              <span class="material-icons">account_circle</span>
+              {{ log.actor }}
+            </span>
+            <span class="role-pill">{{ log.role }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

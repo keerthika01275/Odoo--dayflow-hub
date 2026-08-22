@@ -12,6 +12,35 @@
     </div>
 
     <div class="topbar-right">
+      <!-- Notification Bell -->
+      <div class="notification-wrapper">
+        <button class="btn-icon" id="notification-bell-btn" (click)="toggleNotificationMenu()" title="Notifications">
+          <span class="material-icons">notifications</span>
+          <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+        </button>
+
+        <!-- Dropdown Tray -->
+        <div class="notification-dropdown" *ngIf="notificationOpen">
+          <div class="dropdown-header">
+            <span class="dropdown-title">Notifications</span>
+            <button class="mark-read-btn" (click)="markAllAsRead()">Mark all as read</button>
+          </div>
+
+          <div class="notification-list">
+            <div class="notification-item" *ngFor="let notif of notifications" [class.unread]="!notif.read">
+              <div class="notif-icon">
+                <span class="material-icons">{{ notif.icon }}</span>
+              </div>
+              <div class="notif-content">
+                <div class="notif-title">{{ notif.title }}</div>
+                <div class="notif-msg">{{ notif.message }}</div>
+                <div class="notif-time">{{ notif.time }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="user-badge-container">
         <span class="role-chip" [ngClass]="role?.toLowerCase()">{{ role }}</span>
         <div class="user-info">
