@@ -25,7 +25,11 @@ export class AuthService {
 
   register(request: RegisterRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.API}/register`, request).pipe(
-      tap(response => this.storeUser(response))
+      tap(response => {
+        if (!this.isLoggedIn()) {
+          this.storeUser(response);
+        }
+      })
     );
   }
 

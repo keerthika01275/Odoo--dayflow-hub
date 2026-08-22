@@ -30,8 +30,12 @@ public class AttendanceController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<Attendance>> getMyAttendance(Authentication authentication) {
-        return ResponseEntity.ok(attendanceService.getMyAttendance(authentication.getName()));
+    public ResponseEntity<List<Attendance>> getMyAttendance(
+            Authentication authentication,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate from,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate to) {
+        return ResponseEntity.ok(attendanceService.getMyAttendance(authentication.getName(), date, from, to));
     }
 
     @GetMapping("/me/today")
@@ -39,6 +43,12 @@ public class AttendanceController {
         return attendanceService.getTodayAttendance(authentication.getName())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/employee/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    public ResponseEntity<List<Attendance>> getAttendanceByEmployee(@PathVariable Long id) {
+        return ResponseEntity.ok(attendanceService.getAttendanceByEmployee(id));
     }
 
     @GetMapping

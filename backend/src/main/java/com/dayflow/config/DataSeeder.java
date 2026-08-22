@@ -1,13 +1,22 @@
 package com.dayflow.config;
 
+import com.dayflow.entity.Attendance;
 import com.dayflow.entity.Department;
 import com.dayflow.entity.Employee;
+import com.dayflow.entity.LeaveRequest;
+import com.dayflow.entity.Payroll;
 import com.dayflow.entity.User;
 import com.dayflow.entity.enums.AccountStatus;
+import com.dayflow.entity.enums.AttendanceStatus;
 import com.dayflow.entity.enums.EmployeeStatus;
+import com.dayflow.entity.enums.LeaveStatus;
+import com.dayflow.entity.enums.LeaveType;
 import com.dayflow.entity.enums.Role;
+import com.dayflow.repository.AttendanceRepository;
 import com.dayflow.repository.DepartmentRepository;
 import com.dayflow.repository.EmployeeRepository;
+import com.dayflow.repository.LeaveRepository;
+import com.dayflow.repository.PayrollRepository;
 import com.dayflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -27,6 +37,9 @@ public class DataSeeder implements CommandLineRunner {
     private final DepartmentRepository departmentRepository;
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
+    private final AttendanceRepository attendanceRepository;
+    private final LeaveRepository leaveRepository;
+    private final PayrollRepository payrollRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -34,6 +47,9 @@ public class DataSeeder implements CommandLineRunner {
         if (departmentRepository.count() == 0) seedDepartments();
         if (employeeRepository.count() == 0) seedEmployees();
         if (userRepository.count() == 0) seedUsers();
+        if (attendanceRepository.count() == 0) seedAttendance();
+        if (leaveRepository.count() == 0) seedLeaveRequests();
+        if (payrollRepository.count() == 0) seedPayroll();
     }
 
     private void seedDepartments() {
@@ -143,5 +159,118 @@ public class DataSeeder implements CommandLineRunner {
         log.info("  HR       → priya@dayflow.com   / Priya@123");
         log.info("  EMPLOYEE → rahul@dayflow.com   / Rahul@123");
         log.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    }
+
+    private void seedAttendance() {
+        Employee rahul = employeeRepository.findByEmployeeId("EMP002").orElse(null);
+        Employee priya = employeeRepository.findByEmployeeId("EMP001").orElse(null);
+        Employee anitha = employeeRepository.findByEmployeeId("EMP003").orElse(null);
+        Employee suresh = employeeRepository.findByEmployeeId("EMP006").orElse(null);
+
+        if (rahul == null || priya == null) return;
+
+        LocalDate today = LocalDate.now();
+
+        attendanceRepository.saveAll(List.of(
+            Attendance.builder()
+                .employee(priya)
+                .date(today)
+                .checkIn(today.atTime(9, 2))
+                .checkInLatitude(11.0168)
+                .checkInLongitude(76.9558)
+                .status(AttendanceStatus.PRESENT)
+                .remarks("Checked in at office (12.4m)")
+                .build(),
+
+            Attendance.builder()
+                .employee(anitha)
+                .date(today)
+                .checkIn(today.atTime(9, 15))
+                .checkInLatitude(11.0169)
+                .checkInLongitude(76.9559)
+                .status(AttendanceStatus.PRESENT)
+                .remarks("Checked in at office (24.1m)")
+                .build(),
+
+            Attendance.builder()
+                .employee(suresh)
+                .date(today)
+                .checkIn(today.atTime(9, 45))
+                .checkInLatitude(11.0450)
+                .checkInLongitude(76.9820)
+                .status(AttendanceStatus.LOCATION_EXCEPTION)
+                .remarks("Location Exception: Checked in 3.4km from office")
+                .build()
+        ));
+        log.info("✓ Seeded sample attendance records");
+    }
+
+    private void seedLeaveRequests() {
+        Employee rahul = employeeRepository.findByEmployeeId("EMP002").orElse(null);
+        Employee deepak = employeeRepository.findByEmployeeId("EMP004").orElse(null);
+        Employee kavitha = employeeRepository.findByEmployeeId("EMP005").orElse(null);
+
+        if (deepak == null || kavitha == null) return;
+
+        LocalDate today = LocalDate.now();
+
+        leaveRepository.saveAll(List.of(
+            LeaveRequest.builder()
+                .employee(deepak)
+                .leaveType(LeaveType.SICK)
+                .startDate(today.plusDays(1))
+                .endDate(today.plusDays(2))
+                .reason("Medical appointment and viral recovery")
+                .status(LeaveStatus.PENDING)
+                .build(),
+
+            LeaveRequest.builder()
+                .employee(kavitha)
+                .leaveType(LeaveType.PAID)
+                .startDate(today.plusDays(5))
+                .endDate(today.plusDays(7))
+                .reason("Attending family wedding")
+                .status(LeaveStatus.APPROVED)
+                .reviewedBy("priya@dayflow.com")
+                .reviewComment("Approved. Have a great time!")
+                .build(),
+
+            LeaveRequest.builder()
+                .employee(rahul)
+                .leaveType(LeaveType.PAID)
+                .startDate(today.minusDays(10))
+                .endDate(today.minusDays(8))
+                .reason("Vacation trip")
+                .status(LeaveStatus.APPROVED)
+                .reviewedBy("priya@dayflow.com")
+                .reviewComment("Approved")
+                .build()
+        ));
+        log.info("✓ Seeded sample leave requests");
+    }
+
+    private void seedPayroll() {
+        List<Employee> employees = employeeRepository.findAll();
+        for (Employee emp : employees) {
+            BigDecimal basic = emp.getSalary() != null ? emp.getSalary() : new BigDecimal("50000");
+            BigDecimal housing = basic.multiply(new BigDecimal("0.20"));
+            BigDecimal transport = basic.multiply(new BigDecimal("0.10"));
+            BigDecimal other = new BigDecimal("2000");
+            BigDecimal deductions = basic.multiply(new BigDecimal("0.05"));
+
+            Payroll payroll = Payroll.builder()
+                .employee(emp)
+                .basicSalary(basic)
+                .housingAllowance(housing)
+                .transportAllowance(transport)
+                .otherAllowance(other)
+                .deductions(deductions)
+                .effectiveFrom(LocalDate.of(2024, 1, 1))
+                .build();
+
+            payroll.calculateNetSalary();
+            payrollRepository.save(payroll);
+        }
+        log.info("✓ Seeded payroll records for {} employees", employees.size());
     }
 }

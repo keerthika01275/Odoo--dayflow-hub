@@ -111,10 +111,26 @@ public class AttendanceService {
         return attendanceRepository.save(attendance);
     }
 
-    public List<Attendance> getMyAttendance(String email) {
+    public List<Attendance> getMyAttendance(String email, LocalDate date, LocalDate from, LocalDate to) {
         Employee employee = employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
+
+        if (date != null) {
+            return attendanceRepository.findByEmployeeIdAndDate(employee.getId(), date)
+                    .map(List::of)
+                    .orElse(List.of());
+        }
+        if (from != null && to != null) {
+            return attendanceRepository.findByEmployeeIdAndDateBetween(employee.getId(), from, to);
+        }
         return attendanceRepository.findByEmployeeIdOrderByDateDesc(employee.getId());
+    }
+
+    public List<Attendance> getAttendanceByEmployee(Long employeeId) {
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new ResourceNotFoundException("Employee not found with id: " + employeeId);
+        }
+        return attendanceRepository.findByEmployeeIdOrderByDateDesc(employeeId);
     }
 
     public Optional<Attendance> getTodayAttendance(String email) {

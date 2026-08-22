@@ -95,12 +95,12 @@
         <a routerLink="/employee/payroll" class="link-action">View Paystub</a>
       </div>
       <div class="stat-highlight">
-        <span class="num">₹{{ payroll?.netSalary || '0.00' | number:'1.2-2' }}</span>
+        <span class="num">₹{{ (payroll?.netSalary || 0) | number:'1.2-2' }}</span>
         <span class="unit">Net Monthly Salary</span>
       </div>
       <div class="stat-breakdown">
-        <div><span>Basic:</span> ₹{{ payroll?.basicSalary || '0' | number }}</div>
-        <div><span>Allowances:</span> ₹{{ (payroll?.housingAllowance || 0) + (payroll?.transportAllowance || 0) | number }}</div>
+        <div><span>Basic:</span> ₹{{ (payroll?.basicSalary || 0) | number }}</div>
+        <div><span>Allowances:</span> ₹{{ ((payroll?.housingAllowance || 0) + (payroll?.transportAllowance || 0)) | number }}</div>
       </div>
     </div>
   </div>
