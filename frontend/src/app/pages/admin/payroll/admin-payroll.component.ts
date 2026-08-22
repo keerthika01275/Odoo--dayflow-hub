@@ -80,10 +80,15 @@ export class AdminPayrollComponent implements OnInit {
   savePayroll(): void {
     if (!this.selectedPayroll?.employee?.employeeId) return;
     this.isSaving = true;
-    this.payrollService.update(this.selectedPayroll.employee.employeeId, this.form).subscribe({
-      next: () => {
+    const empId = this.selectedPayroll.employee.employeeId;
+    this.payrollService.update(empId, this.form).subscribe({
+      next: (updated: Payroll) => {
         const name = `${this.selectedPayroll?.employee?.firstName} ${this.selectedPayroll?.employee?.lastName}`;
         this.toast.success(`Payroll updated for ${name}`);
+        const idx = this.payrollList.findIndex(p => p.employee?.employeeId === empId);
+        if (idx !== -1 && updated) {
+          this.payrollList[idx] = { ...this.payrollList[idx], ...updated };
+        }
         this.isSaving = false;
         this.closeModal();
         this.loadData();

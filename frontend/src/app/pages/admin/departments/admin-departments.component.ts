@@ -126,9 +126,11 @@ export class AdminDepartmentsComponent implements OnInit {
 
   deleteDepartment(): void {
     if (this.deleteConfirmId === null) return;
-    this.deptService.delete(this.deleteConfirmId).subscribe({
+    const idToDelete = this.deleteConfirmId;
+    this.deptService.delete(idToDelete).subscribe({
       next: () => {
         this.toast.success('Department deleted successfully.');
+        this.departments = this.departments.filter(d => d.id !== idToDelete);
         this.deleteConfirmId = null;
         this.loadData();
       },

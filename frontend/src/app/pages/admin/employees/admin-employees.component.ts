@@ -133,9 +133,12 @@ export class AdminEmployeesComponent implements OnInit {
 
   deleteEmployee(): void {
     if (this.deleteConfirmId === null) return;
-    this.employeeService.delete(this.deleteConfirmId).subscribe({
+    const idToDelete = this.deleteConfirmId;
+    this.employeeService.delete(idToDelete).subscribe({
       next: () => {
         this.toast.success('Employee removed from the system.');
+        this.employees = this.employees.filter(e => e.id !== idToDelete);
+        this.applyFilter();
         this.deleteConfirmId = null;
         this.loadData();
       },
