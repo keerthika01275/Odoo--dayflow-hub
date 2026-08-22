@@ -7,10 +7,15 @@ import com.dayflow.entity.Employee;
 import com.dayflow.entity.enums.Role;
 import com.dayflow.exception.DuplicateResourceException;
 import com.dayflow.exception.ResourceNotFoundException;
+import com.dayflow.repository.AttendanceRepository;
 import com.dayflow.repository.DepartmentRepository;
 import com.dayflow.repository.EmployeeRepository;
+import com.dayflow.repository.LeaveRepository;
+import com.dayflow.repository.PayrollRepository;
+import com.dayflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +26,10 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
+    private final AttendanceRepository attendanceRepository;
+    private final LeaveRepository leaveRepository;
+    private final PayrollRepository payrollRepository;
+    private final UserRepository userRepository;
 
     public List<EmployeeResponse> getAllEmployees() {
         return employeeRepository.findAll()
@@ -110,11 +119,20 @@ public class EmployeeService {
         return EmployeeResponse.fromEntity(employeeRepository.save(emp));
     }
 
+    @Transactional
     public void deleteEmployee(Long id) {
-        if (!employeeRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Employee not found with id: " + id);
+        Employee emp = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
+
+        // Cascade cleanup of associated records
+        attendanceRepository.deleteByEmployeeId(id);
+        leaveRepository.deleteByEmployeeId(id);
+        payrollRepository.deleteByEmployeeId(id);
+        if (emp.getEmployeeId() != null) {
+            userRepository.deleteByEmployeeId(emp.getEmployeeId());
         }
-        employeeRepository.deleteById(id);
+
+        employeeRepository.delete(emp);
     }
 
     public Employee getEmployeeEntityByEmployeeId(String employeeId) {

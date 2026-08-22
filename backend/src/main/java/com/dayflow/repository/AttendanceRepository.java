@@ -18,4 +18,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByStatus(AttendanceStatus status);
     long countByDateAndStatus(LocalDate date, AttendanceStatus status);
     long countByDate(LocalDate date);
+    void deleteByEmployeeId(Long employeeId);
 }
+

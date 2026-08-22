@@ -138,6 +138,10 @@ export class AdminEmployeesComponent implements OnInit {
         this.toast.success('Employee removed from the system.');
         this.deleteConfirmId = null;
         this.loadData();
+      },
+      error: (err) => {
+        this.toast.error(err.error?.message || 'Failed to remove employee.');
+        this.deleteConfirmId = null;
       }
     });
   }
