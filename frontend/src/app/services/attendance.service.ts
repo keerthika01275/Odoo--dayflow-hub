@@ -21,8 +21,12 @@ export class AttendanceService {
     return this.http.get<Attendance[]>(`${this.API}/me`);
   }
 
-  getMyAttendanceByDate(date: string): Observable<Attendance> {
-    return this.http.get<Attendance>(`${this.API}/me`, { params: new HttpParams().set('date', date) });
+  getTodayAttendance(): Observable<Attendance> {
+    return this.http.get<Attendance>(`${this.API}/me/today`);
+  }
+
+  getMyAttendanceByDate(date: string): Observable<Attendance[]> {
+    return this.http.get<Attendance[]>(`${this.API}/me`, { params: new HttpParams().set('date', date) });
   }
 
   getMyAttendanceRange(from: string, to: string): Observable<Attendance[]> {

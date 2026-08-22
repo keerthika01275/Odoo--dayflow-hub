@@ -101,10 +101,11 @@ public class EmployeeService {
         Employee emp = employeeRepository.findByEmployeeId(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found with ID: " + employeeId));
 
-        // Employees can only update phone, address, profilePicture
-        emp.setPhone(request.getPhone());
-        emp.setAddress(request.getAddress());
-        emp.setProfilePicture(request.getProfilePicture());
+        if (request.getFirstName() != null && !request.getFirstName().isBlank()) emp.setFirstName(request.getFirstName());
+        if (request.getLastName() != null && !request.getLastName().isBlank()) emp.setLastName(request.getLastName());
+        if (request.getPhone() != null) emp.setPhone(request.getPhone());
+        if (request.getAddress() != null) emp.setAddress(request.getAddress());
+        if (request.getProfilePicture() != null) emp.setProfilePicture(request.getProfilePicture());
 
         return EmployeeResponse.fromEntity(employeeRepository.save(emp));
     }

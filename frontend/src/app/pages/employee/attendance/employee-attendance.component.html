@@ -72,6 +72,46 @@
     </div>
   </div>
 
+  <!-- GPS Geofence Visualizer Card -->
+  <div class="geofence-radar-card">
+    <div class="radar-visual">
+      <div class="radar-circle radar-circle--outer"></div>
+      <div class="radar-circle radar-circle--middle"></div>
+      <div class="radar-circle radar-circle--inner"></div>
+      <div class="radar-pin radar-pin--office">
+        <span class="material-icons">domain</span>
+        <span class="pin-label">Office Base</span>
+      </div>
+      <div class="radar-pin radar-pin--user" [class.radar-pin--active]="currentLocation">
+        <div class="pulse-ring"></div>
+        <span class="material-icons">person_pin_circle</span>
+        <span class="pin-label">You</span>
+      </div>
+    </div>
+
+    <div class="radar-details">
+      <div class="radar-title">
+        <span class="material-icons">satellite_alt</span>
+        <h4>Geofence Perimeter Security</h4>
+      </div>
+      <p class="radar-desc">
+        Your attendance check-in is authenticated against the official enterprise perimeter (Radius: <strong>200 meters</strong> around <code>11.0168° N, 76.9558° E</code>).
+      </p>
+      <div class="radar-stats">
+        <div class="stat-pill">
+          <span class="label">Perimeter:</span>
+          <span class="val text-primary">200m Allowed</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">GPS Fix:</span>
+          <span class="val" [ngClass]="currentLocation ? 'text-success' : 'text-warning'">
+            {{ currentLocation ? 'Locked (High Precision)' : 'Acquiring...' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- History Table -->
   <div class="section-header">
     <h2>Attendance History</h2>

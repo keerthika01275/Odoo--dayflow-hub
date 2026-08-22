@@ -33,14 +33,14 @@ export interface Employee {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
-  address: string;
+  phone?: string;
+  address?: string;
   department?: DepartmentResponse;
-  designation: string;
-  joiningDate: string;
-  salary: number;
+  designation?: string;
+  joiningDate?: string;
+  salary?: number;
   profilePicture?: string;
-  status: string;
+  status?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -87,8 +87,8 @@ export interface LeaveRequest {
 
 // Backend Payroll entity shape
 export interface Payroll {
-  id: number;
-  employee: Employee;
+  id?: number;
+  employee?: Employee;
   basicSalary: number;
   housingAllowance: number;
   transportAllowance: number;

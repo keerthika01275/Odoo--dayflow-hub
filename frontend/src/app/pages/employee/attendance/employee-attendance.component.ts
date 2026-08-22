@@ -19,7 +19,7 @@ export class EmployeeAttendanceComponent implements OnInit {
   isCheckingIn = false;
   isCheckingOut = false;
   locationError = '';
-  currentLocation: { lat: number; lng: number } | null = null;
+  currentLocation: { lat: number; lng: number } = { lat: 11.0168, lng: 76.9558 };
   today = new Date();
 
   get checkedInToday(): boolean {
@@ -42,68 +42,92 @@ export class EmployeeAttendanceComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const coords = this.locationService.getInstantLocation();
+    this.currentLocation = { lat: coords.latitude, lng: coords.longitude };
     this.loadHistory();
-    this.detectLocation();
   }
 
-  detectLocation(): void {
-    this.locationService.getCurrentLocation().then(
-      (coords) => {
-        this.currentLocation = { lat: coords.latitude, lng: coords.longitude };
-      },
-      (_err) => {
-        this.locationError = 'Location access denied. GPS check-in requires location permission.';
-      }
-    );
+  useOfficeLocation(): void {
+    const office = this.locationService.getOfficeCoordinates();
+    this.currentLocation = { lat: office.latitude, lng: office.longitude };
+    this.toast.info('Using Office GPS coordinates (11.0168, 76.9558).');
   }
 
   loadHistory(): void {
     this.isLoading = true;
+
+    // 1. Fetch today's dedicated record from server
+    this.attendanceService.getTodayAttendance().subscribe({
+      next: (today: Attendance) => {
+        if (today) {
+          this.todayRecord = today;
+        }
+      },
+      error: () => {}
+    });
+
+    // 2. Fetch full attendance history
     this.attendanceService.getMyAttendance().subscribe({
       next: (list: Attendance[]) => {
-        this.attendanceHistory = list.sort((a, b) =>
-          new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
-        const today = new Date().toISOString().split('T')[0];
-        this.todayRecord = list.find(a => {
-          const d = typeof a.date === 'string' ? a.date : String(a.date);
-          return d.startsWith(today);
-        }) || null;
+        this.attendanceHistory = list || [];
+        const todayIso = new Date().toISOString().split('T')[0];
+        const localToday = this.getLocalDateString(new Date());
+
+        if (!this.todayRecord) {
+          this.todayRecord = this.attendanceHistory.find(a => {
+            const d = this.normalizeDateString(a.date);
+            return d === todayIso || d === localToday;
+          }) || null;
+        }
         this.isLoading = false;
       },
-      error: () => { this.isLoading = false; }
+      error: () => {
+        this.isLoading = false;
+      }
     });
   }
 
   checkIn(): void {
     if (!this.currentLocation) {
-      this.toast.error('Location not available. Please allow location access.');
-      return;
+      const office = this.locationService.getOfficeCoordinates();
+      this.currentLocation = { lat: office.latitude, lng: office.longitude };
     }
     this.isCheckingIn = true;
     this.attendanceService.checkIn(this.currentLocation.lat, this.currentLocation.lng).subscribe({
       next: (record: Attendance) => {
+        this.todayRecord = record;
         this.toast.success(`✓ Checked in successfully. Have a productive day!`);
         this.isCheckingIn = false;
         this.loadHistory();
       },
-      error: () => { this.isCheckingIn = false; }
+      error: (err: any) => {
+        this.isCheckingIn = false;
+        if (err.status === 409) {
+          this.loadHistory();
+        }
+      }
     });
   }
 
   checkOut(): void {
     if (!this.currentLocation) {
-      this.toast.error('Location not available. Please allow location access.');
-      return;
+      const office = this.locationService.getOfficeCoordinates();
+      this.currentLocation = { lat: office.latitude, lng: office.longitude };
     }
     this.isCheckingOut = true;
     this.attendanceService.checkOut(this.currentLocation.lat, this.currentLocation.lng).subscribe({
       next: (record: Attendance) => {
+        this.todayRecord = record;
         this.toast.success(`✓ Checked out successfully. Great work today!`);
         this.isCheckingOut = false;
         this.loadHistory();
       },
-      error: () => { this.isCheckingOut = false; }
+      error: (err: any) => {
+        this.isCheckingOut = false;
+        if (err.status === 409) {
+          this.loadHistory();
+        }
+      }
     });
   }
 
@@ -119,12 +143,38 @@ export class EmployeeAttendanceComponent implements OnInit {
     return map[status] || 'status--absent';
   }
 
-  formatDateTime(dt: string | null | undefined): string {
+  formatDateTime(dt: any): string {
     if (!dt) return '—';
     try {
-      return new Date(dt).toLocaleTimeString('en-IN', {
+      if (Array.isArray(dt)) {
+        const d = new Date(dt[0], dt[1] - 1, dt[2], dt[3] || 0, dt[4] || 0, dt[5] || 0);
+        return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+      }
+      const d = new Date(dt);
+      if (isNaN(d.getTime())) return String(dt);
+      return d.toLocaleTimeString('en-IN', {
         hour: '2-digit', minute: '2-digit', hour12: true
       });
-    } catch { return String(dt); }
+    } catch {
+      return String(dt);
+    }
+  }
+
+  normalizeDateString(dateVal: any): string {
+    if (!dateVal) return '';
+    if (Array.isArray(dateVal)) {
+      const y = dateVal[0];
+      const m = String(dateVal[1]).padStart(2, '0');
+      const d = String(dateVal[2]).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    return String(dateVal).split('T')[0];
+  }
+
+  getLocalDateString(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 }

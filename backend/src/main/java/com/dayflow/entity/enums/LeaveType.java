@@ -3,5 +3,9 @@ package com.dayflow.entity.enums;
 public enum LeaveType {
     PAID,
     SICK,
-    UNPAID
+    UNPAID,
+    CASUAL,
+    EARNED,
+    MATERNITY,
+    PATERNITY
 }

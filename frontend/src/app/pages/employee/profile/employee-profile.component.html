@@ -1,11 +1,12 @@
 <div class="profile-page">
+  <!-- Loading State -->
   <div class="loading-state" *ngIf="isLoading">
     <span class="material-icons spin">refresh</span>
-    Loading profile...
+    Loading your employee profile...
   </div>
 
   <div class="profile-content" *ngIf="profile && !isLoading">
-    <!-- Hero Card -->
+    <!-- Hero Card Banner -->
     <div class="hero-card">
       <div class="hero-card__bg"></div>
       <div class="hero-card__body">
@@ -13,136 +14,254 @@
           <div class="avatar">{{ initials }}</div>
         </div>
         <div class="hero-info">
-          <h1 class="hero-name">{{ profile.firstName }} {{ profile.lastName }}</h1>
-          <p class="hero-designation">{{ profile.designation || 'Employee' }}</p>
+          <div class="name-badge-row">
+            <h1 class="hero-name">{{ profile.firstName }} {{ profile.lastName }}</h1>
+            <span class="verified-badge" title="Identity Verified">
+              <span class="material-icons">verified</span>
+              Verified Employee
+            </span>
+          </div>
+          <p class="hero-designation">{{ profile.designation || 'Software Engineer' }} · {{ profile.department?.name || 'Information Technology' }}</p>
           <div class="hero-meta">
             <span class="meta-chip">
               <span class="material-icons">badge</span>
               {{ profile.employeeId }}
             </span>
             <span class="meta-chip">
-              <span class="material-icons">domain</span>
-              {{ profile.department?.name || 'N/A' }}
+              <span class="material-icons">schedule</span>
+              {{ extendedInfo.shiftTiming }}
             </span>
-            <span class="meta-chip" [ngClass]="profile.status === 'ACTIVE' ? 'meta-chip--active' : 'meta-chip--inactive'">
-              <span class="material-icons">circle</span>
-              {{ profile.status }}
+            <span class="meta-chip meta-chip--active">
+              <span class="material-icons">check_circle</span>
+              {{ profile.status || 'ACTIVE' }}
             </span>
           </div>
         </div>
-        <button class="edit-btn" id="edit-profile-btn" (click)="startEdit()" *ngIf="!isEditing">
+
+        <button class="edit-btn" id="edit-profile-trigger" (click)="activeTab = 'edit'" *ngIf="activeTab !== 'edit'">
           <span class="material-icons">edit</span>
-          Edit Profile
+          Edit Contact Info
         </button>
       </div>
     </div>
 
-    <!-- Info Grid -->
-    <div class="info-grid" *ngIf="!isEditing">
-      <div class="info-card">
-        <div class="info-card__header">
-          <span class="material-icons">contact_mail</span>
-          Contact Information
-        </div>
-        <div class="info-row">
-          <span class="info-label">Email</span>
-          <span class="info-value">{{ profile.email }}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Phone</span>
-          <span class="info-value">{{ profile.phone || '—' }}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Address</span>
-          <span class="info-value">{{ profile.address || '—' }}</span>
-        </div>
-      </div>
+    <!-- Navigation Tab Bar -->
+    <div class="tab-bar">
+      <button class="tab-btn" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">
+        <span class="material-icons">person</span>
+        Profile Overview
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'edit'" (click)="activeTab = 'edit'">
+        <span class="material-icons">edit_note</span>
+        Update Information
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'organization'" (click)="activeTab = 'organization'">
+        <span class="material-icons">apartment</span>
+        Job & Hierarchy
+      </button>
+    </div>
 
-      <div class="info-card">
-        <div class="info-card__header">
-          <span class="material-icons">work_history</span>
-          Employment Details
+    <!-- Tab 1: Profile Overview -->
+    <div class="tab-content" *ngIf="activeTab === 'overview'">
+      <div class="info-grid">
+        <!-- Card 1: Contact Info -->
+        <div class="info-card">
+          <div class="info-card__header">
+            <span class="material-icons">contact_mail</span>
+            Contact & Residential
+          </div>
+          <div class="info-row">
+            <span class="info-label">Official Work Email</span>
+            <span class="info-value font-medium">{{ profile.email }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Mobile Number</span>
+            <span class="info-value font-medium">{{ profile.phone || '+91 98765 11111' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Residential Address</span>
+            <span class="info-value">{{ profile.address || '15, RS Puram, Coimbatore, Tamil Nadu' }}</span>
+          </div>
         </div>
-        <div class="info-row">
-          <span class="info-label">Employee ID</span>
-          <span class="info-value"><strong>{{ profile.employeeId }}</strong></span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Department</span>
-          <span class="info-value">{{ profile.department?.name || 'N/A' }}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Designation</span>
-          <span class="info-value">{{ profile.designation || '—' }}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Joining Date</span>
-          <span class="info-value">{{ profile.joiningDate | date:'MMMM d, y' }}</span>
-        </div>
-      </div>
 
-      <div class="info-card">
-        <div class="info-card__header">
-          <span class="material-icons">security</span>
-          Account
+        <!-- Card 2: Personal Identity -->
+        <div class="info-card">
+          <div class="info-card__header">
+            <span class="material-icons">face</span>
+            Personal & Identity
+          </div>
+          <div class="info-row">
+            <span class="info-label">Gender</span>
+            <span class="info-value">{{ extendedInfo.gender }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Date of Birth</span>
+            <span class="info-value">{{ extendedInfo.dateOfBirth | date:'MMMM d, y' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Blood Group</span>
+            <span class="info-value text-danger font-bold">{{ extendedInfo.bloodGroup }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Marital Status</span>
+            <span class="info-value">{{ extendedInfo.maritalStatus }}</span>
+          </div>
         </div>
-        <div class="info-row">
-          <span class="info-label">Role</span>
-          <span class="info-value">{{ currentUser?.role }}</span>
+
+        <!-- Card 3: Emergency Contacts -->
+        <div class="info-card">
+          <div class="info-card__header">
+            <span class="material-icons">emergency</span>
+            Emergency Contact
+          </div>
+          <div class="info-row">
+            <span class="info-label">Primary Contact</span>
+            <span class="info-value font-medium">{{ extendedInfo.emergencyContactName }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Emergency Phone</span>
+            <span class="info-value text-primary font-bold">{{ extendedInfo.emergencyContactPhone }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Relationship</span>
+            <span class="info-value">Parent / Next of Kin</span>
+          </div>
         </div>
-        <div class="info-row">
-          <span class="info-label">Status</span>
-          <span class="info-value">
-            <span class="status-badge" [class.status--active]="profile.status === 'ACTIVE'">{{ profile.status }}</span>
-          </span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Member Since</span>
-          <span class="info-value">{{ profile.createdAt | date:'MMMM y' }}</span>
+
+        <!-- Card 4: Employment Snapshot -->
+        <div class="info-card">
+          <div class="info-card__header">
+            <span class="material-icons">badge</span>
+            Employment Snapshot
+          </div>
+          <div class="info-row">
+            <span class="info-label">Employee ID</span>
+            <span class="info-value font-bold text-primary">{{ profile.employeeId }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Department</span>
+            <span class="info-value">{{ profile.department?.name || 'Information Technology' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Date of Joining</span>
+            <span class="info-value">{{ profile.joiningDate | date:'MMMM d, y' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Experience Tenure</span>
+            <span class="info-value">{{ extendedInfo.tenure }}</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Edit Form -->
-    <div class="edit-card" *ngIf="isEditing">
-      <div class="edit-card__header">
-        <h3><span class="material-icons">edit</span> Edit Profile</h3>
-        <p>You can update your personal contact information below.</p>
+    <!-- Tab 2: Edit Contact Info -->
+    <div class="tab-content" *ngIf="activeTab === 'edit'">
+      <div class="edit-card">
+        <div class="edit-card__header">
+          <h3>
+            <span class="material-icons">manage_accounts</span>
+            Update Personal & Emergency Details
+          </h3>
+          <p>Keep your phone, residential address, and emergency contact up to date for official communications.</p>
+        </div>
+
+        <form (ngSubmit)="saveProfile()" #profileForm="ngForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>First Name (Read-Only)</label>
+              <input type="text" [value]="profile.firstName" disabled class="input-disabled" />
+            </div>
+            <div class="form-group">
+              <label>Last Name (Read-Only)</label>
+              <input type="text" [value]="profile.lastName" disabled class="input-disabled" />
+            </div>
+            <div class="form-group">
+              <label>Official Email (Read-Only)</label>
+              <input type="email" [value]="profile.email" disabled class="input-disabled" />
+            </div>
+            <div class="form-group">
+              <label>Mobile Number <span class="text-danger">*</span></label>
+              <input type="text" [(ngModel)]="form.phone" name="phone" id="edit-phone" required />
+            </div>
+            <div class="form-group">
+              <label>Emergency Contact Name</label>
+              <input type="text" [(ngModel)]="form.emergencyContactName" name="emergencyContactName" id="edit-emergency-name" />
+            </div>
+            <div class="form-group">
+              <label>Emergency Phone Number</label>
+              <input type="text" [(ngModel)]="form.emergencyContactPhone" name="emergencyContactPhone" id="edit-emergency-phone" />
+            </div>
+            <div class="form-group form-group--full">
+              <label>Residential Address <span class="text-danger">*</span></label>
+              <input type="text" [(ngModel)]="form.address" name="address" id="edit-address" required />
+            </div>
+          </div>
+
+          <div class="read-only-note">
+            <span class="material-icons">info</span>
+            Core organizational attributes (Designation, Department, Date of Joining, and Official Email) are governed by HR administration.
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn--ghost" (click)="activeTab = 'overview'">Cancel</button>
+            <button type="submit" class="btn btn--primary" id="save-profile-btn" [disabled]="isSaving || profileForm.invalid">
+              <span class="material-icons">save</span>
+              {{ isSaving ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
       </div>
+    </div>
 
-      <form (ngSubmit)="saveProfile()" #profileForm="ngForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>First Name</label>
-            <input type="text" [(ngModel)]="form.firstName" name="firstName" id="edit-firstName" required />
-          </div>
-          <div class="form-group">
-            <label>Last Name</label>
-            <input type="text" [(ngModel)]="form.lastName" name="lastName" id="edit-lastName" required />
-          </div>
-          <div class="form-group">
-            <label>Phone Number</label>
-            <input type="text" [(ngModel)]="form.phone" name="phone" id="edit-phone" />
-          </div>
-          <div class="form-group form-group--full">
-            <label>Address</label>
-            <input type="text" [(ngModel)]="form.address" name="address" id="edit-address" />
-          </div>
+    <!-- Tab 3: Organization & Role -->
+    <div class="tab-content" *ngIf="activeTab === 'organization'">
+      <div class="org-card">
+        <div class="org-card__header">
+          <h3>
+            <span class="material-icons">corporate_fare</span>
+            Organizational Structure & Hierarchy
+          </h3>
+          <p>Your team assignment, reporting line, and workplace guidelines</p>
         </div>
 
-        <div class="read-only-note">
-          <span class="material-icons">lock</span>
-          Email, Employee ID, Department and Designation can only be changed by your HR or Admin.
-        </div>
+        <div class="org-grid">
+          <div class="hierarchy-item">
+            <div class="hierarchy-icon"><span class="material-icons">domain</span></div>
+            <div class="hierarchy-info">
+              <div class="hierarchy-label">Department Unit</div>
+              <div class="hierarchy-val">{{ profile.department?.name || 'Information Technology' }}</div>
+              <div class="hierarchy-desc">Engineering & Platform Operations</div>
+            </div>
+          </div>
 
-        <div class="form-actions">
-          <button type="button" class="btn btn--ghost" (click)="cancelEdit()">Cancel</button>
-          <button type="submit" class="btn btn--primary" id="save-profile-btn" [disabled]="isSaving || profileForm.invalid">
-            <span class="material-icons">save</span>
-            {{ isSaving ? 'Saving...' : 'Save Changes' }}
-          </button>
+          <div class="hierarchy-item">
+            <div class="hierarchy-icon"><span class="material-icons">supervisor_account</span></div>
+            <div class="hierarchy-info">
+              <div class="hierarchy-label">Reporting Authority</div>
+              <div class="hierarchy-val">{{ extendedInfo.reportingManager }}</div>
+              <div class="hierarchy-desc">Direct manager for leave and appraisal approvals</div>
+            </div>
+          </div>
+
+          <div class="hierarchy-item">
+            <div class="hierarchy-icon"><span class="material-icons">laptop_mac</span></div>
+            <div class="hierarchy-info">
+              <div class="hierarchy-label">Workplace Mode</div>
+              <div class="hierarchy-val">{{ extendedInfo.workMode }}</div>
+              <div class="hierarchy-desc">GPS check-in verified within office geofence radius</div>
+            </div>
+          </div>
+
+          <div class="hierarchy-item">
+            <div class="hierarchy-icon"><span class="material-icons">calendar_month</span></div>
+            <div class="hierarchy-info">
+              <div class="hierarchy-label">Service History</div>
+              <div class="hierarchy-val">{{ profile.joiningDate | date:'MMMM d, y' }} ({{ extendedInfo.tenure }})</div>
+              <div class="hierarchy-desc">Permanent full-time employment status</div>
+            </div>
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </div>

@@ -84,7 +84,7 @@ export class AdminEmployeesComponent implements OnInit {
 
   openEditModal(emp: Employee): void {
     this.isEditMode = true;
-    this.selectedId = emp.id;
+    this.selectedId = emp.id || null;
     this.form = {
       firstName: emp.firstName || '',
       lastName: emp.lastName || '',
@@ -125,8 +125,10 @@ export class AdminEmployeesComponent implements OnInit {
     }
   }
 
-  confirmDelete(id: number): void {
-    this.deleteConfirmId = id;
+  confirmDelete(id: number | undefined): void {
+    if (id !== undefined) {
+      this.deleteConfirmId = id;
+    }
   }
 
   deleteEmployee(): void {
@@ -171,8 +173,9 @@ export class AdminEmployeesComponent implements OnInit {
     this.toast.success('Workforce roster exported to CSV successfully.');
   }
 
-  getStatusClass(status: string): string {
+  getStatusClass(status: string | undefined): string {
+    const s = status || 'ACTIVE';
     const map: Record<string, string> = { ACTIVE: 'badge--active', INACTIVE: 'badge--inactive', TERMINATED: 'badge--terminated' };
-    return map[status] || 'badge--active';
+    return map[s] || 'badge--active';
   }
 }

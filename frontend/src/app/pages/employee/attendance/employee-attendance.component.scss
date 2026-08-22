@@ -77,6 +77,142 @@
   }
 }
 
+/* Geofence Radar Card */
+.geofence-radar-card {
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  flex-wrap: wrap;
+}
+
+.radar-visual {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0F172A, #1E293B);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.2);
+}
+
+.radar-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(37, 99, 235, 0.25);
+
+  &--outer { width: 120px; height: 120px; }
+  &--middle { width: 80px; height: 80px; }
+  &--inner { width: 40px; height: 40px; }
+}
+
+.radar-pin {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+
+  .pin-label {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  &--office {
+    color: #60A5FA;
+    .material-icons { font-size: 18px; }
+  }
+
+  &--user {
+    top: 30px;
+    right: 32px;
+    color: #4ADE80;
+    .material-icons { font-size: 20px; }
+
+    .pulse-ring {
+      position: absolute;
+      top: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(74, 222, 128, 0.4);
+      animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+  }
+}
+
+.radar-details {
+  flex: 1;
+}
+
+.radar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+
+  .material-icons { color: #2563EB; font-size: 20px; }
+  h4 { margin: 0; font-size: 16px; font-weight: 700; color: #1E3A5F; }
+}
+
+.radar-desc {
+  font-size: 13px;
+  color: #64748B;
+  margin: 0 0 16px;
+  line-height: 1.5;
+
+  code {
+    background: #F1F5F9;
+    color: #2563EB;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+}
+
+.radar-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+
+  .label { color: #94A3B8; font-weight: 600; }
+  .val { font-weight: 700; }
+}
+
+.text-primary { color: #2563EB; }
+.text-success { color: #16A34A; }
+.text-warning { color: #D97706; }
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
 .today-status-ring {
   width: 72px;
   height: 72px;
