@@ -1,0 +1,107 @@
+/* DAYFLOW Design Tokens & Global CSS */
+:root {
+  --primary-color: #1E3A5F;
+  --primary-hover: #162c48;
+  --accent-blue: #2563EB;
+  --accent-hover: #1d4ed8;
+  --bg-color: #F8FAFC;
+  --card-bg: #FFFFFF;
+  --text-main: #0F172A;
+  --text-secondary: #64748B;
+  --border-color: #E2E8F0;
+  --success-color: #16A34A;
+  --warning-color: #D97706;
+  --error-color: #DC2626;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dayflow-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Common Utility Classes */
+.card-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.badge-success {
+    background-color: rgba(22, 163, 74, 0.1);
+    color: var(--success-color);
+  }
+
+  &.badge-warning {
+    background-color: rgba(217, 119, 6, 0.1);
+    color: var(--warning-color);
+  }
+
+  &.badge-error {
+    background-color: rgba(220, 38, 38, 0.1);
+    color: var(--error-color);
+  }
+
+  &.badge-primary {
+    background-color: rgba(37, 99, 235, 0.1);
+    color: var(--accent-blue);
+  }
+}
+
+.btn-primary {
+  background-color: var(--accent-blue);
+  color: #ffffff;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--accent-hover);
+  }
+}
