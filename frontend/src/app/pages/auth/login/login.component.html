@@ -41,8 +41,12 @@
 
       <button type="submit" class="btn-submit" [disabled]="loginForm.invalid || loading">
         <span *ngIf="!loading">Sign In to Dayflow</span>
-        <span *ngIf="loading">Signing in...</span>
+        <span *ngIf="loading && !isSlowServer">Signing in...</span>
+        <span *ngIf="loading && isSlowServer">⚡ Waking up server (free tier)...</span>
       </button>
+      <p *ngIf="isSlowServer" style="font-size: 0.8rem; color: #64748b; text-align: center; margin-top: 8px;">
+        Render free tier puts idle servers to sleep. First request takes ~30s to boot up.
+      </p>
     </form>
 
     <div class="demo-section">

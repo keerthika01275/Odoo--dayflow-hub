@@ -28,22 +28,39 @@ export class LoginComponent {
     });
   }
 
+  isSlowServer = false;
+  private slowTimer: any;
+
   onSubmit(): void {
     if (this.loginForm.invalid) return;
 
     this.loading = true;
     this.errorMessage = '';
+    this.isSlowServer = false;
+
+    // Display cold-start hint if request takes longer than 2.5s (free host spin-up)
+    this.slowTimer = setTimeout(() => {
+      if (this.loading) {
+        this.isSlowServer = true;
+      }
+    }, 2500);
 
     this.authService.login(this.loginForm.value).subscribe({
       next: (res: LoginResponse) => {
+        clearTimeout(this.slowTimer);
         this.loading = false;
+        this.isSlowServer = false;
         const targetRoute = this.authService.getDashboardRoute();
         this.router.navigate([targetRoute]);
       },
       error: (err: any) => {
+        clearTimeout(this.slowTimer);
         this.loading = false;
+        this.isSlowServer = false;
         if (err.error && err.error.message) {
           this.errorMessage = err.error.message;
+        } else if (err.status === 0) {
+          this.errorMessage = 'Server is booting up (cold start). Please wait a moment and try again.';
         } else {
           this.errorMessage = 'Invalid email or password. Please try again.';
         }
