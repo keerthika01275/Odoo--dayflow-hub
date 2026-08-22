@@ -1,0 +1,90 @@
+# ==========================================
+# DAYFLOW - HRMS
+# ==========================================
+
+# ---------- IDE ----------
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Java / Maven ----------
+backend/target/
+backend/.mvn/
+*.class
+*.log
+
+# Maven generated files
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# ---------- Spring Boot ----------
+application-local.properties
+application-local.yml
+application-prod.properties
+application-prod.yml
+
+# ---------- Environment / Secrets ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Angular / Node ----------
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.cache/
+frontend/coverage/
+
+# Angular logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ---------- TypeScript ----------
+*.tsbuildinfo
+
+# ---------- Testing ----------
+test-results/
+playwright-report/
+
+# ---------- Temporary files ----------
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ---------- Database ----------
+*.sql.bak
+*.db
+*.sqlite
+*.sqlite3
+
+# ---------- Generated files ----------
+*.jar
+*.war
+
+# ---------- Logs ----------
+logs/
+*.log
+
+# ---------- Build / Cache ----------
+.cache/
+.tmp/
+temp/

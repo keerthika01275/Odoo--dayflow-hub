@@ -1,0 +1,103 @@
+<div class="dashboard-page">
+  <!-- Header -->
+  <div class="header-bar">
+    <div>
+      <h1 class="page-title">Organization Control Center</h1>
+      <p class="subtitle">System-wide governance, workforce distribution & quick admin actions</p>
+    </div>
+    <span class="badge badge-primary">Admin Control Center</span>
+  </div>
+
+  <!-- Organization Metrics -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon emp">👥</div>
+      <div class="metric-details">
+        <span class="metric-value">{{ employees.length }}</span>
+        <span class="metric-label">Total Employees</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon hr">👨💼</div>
+      <div class="metric-details">
+        <span class="metric-value">{{ hrAccountCount }}</span>
+        <span class="metric-label">Total HR Accounts</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon dept">🏢</div>
+      <div class="metric-details">
+        <span class="metric-value">{{ departments.length }}</span>
+        <span class="metric-label">Total Departments</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon present">✓</div>
+      <div class="metric-details">
+        <span class="metric-value">{{ presentTodayCount }}</span>
+        <span class="metric-label">Present Today</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions Bar -->
+  <div class="card-panel quick-actions-panel">
+    <h3 class="panel-title">Quick Actions</h3>
+    <div class="actions-buttons">
+      <a routerLink="/admin/employees" class="btn-quick primary">+ Add Employee</a>
+      <a routerLink="/admin/hr-accounts" class="btn-quick secondary">+ Create HR Account</a>
+      <a routerLink="/admin/departments" class="btn-quick outline">+ Add Department</a>
+      <a routerLink="/admin/payroll" class="btn-quick dark">+ Update Payroll</a>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <!-- Department Breakdown -->
+    <div class="card-panel">
+      <div class="panel-header">
+        <h3 class="panel-title">Department Distribution</h3>
+        <a routerLink="/admin/departments" class="link-action">Manage Departments</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Department Name</th>
+              <th>Description</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dept of departments">
+              <td><strong>{{ dept.name }}</strong></td>
+              <td class="text-muted">{{ dept.description }}</td>
+              <td><span class="badge badge-success">{{ dept.status }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- System Activity Log -->
+    <div class="card-panel">
+      <div class="panel-header">
+        <h3 class="panel-title">System Activity Log</h3>
+        <a routerLink="/admin/activity" class="link-action">Full Logs</a>
+      </div>
+
+      <div class="activity-feed">
+        <div *ngFor="let log of systemLogs" class="activity-item">
+          <div class="log-time">{{ log.time }}</div>
+          <div class="log-content">
+            <div class="log-action">{{ log.action }}</div>
+            <div class="log-details">{{ log.details }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

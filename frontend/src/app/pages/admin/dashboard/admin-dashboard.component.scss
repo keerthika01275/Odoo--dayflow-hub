@@ -1,0 +1,213 @@
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+  }
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.metric-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+
+  .metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+
+    &.emp { background: rgba(30, 58, 95, 0.1); color: var(--primary-color); }
+    &.hr { background: rgba(37, 99, 235, 0.1); color: var(--accent-blue); }
+    &.dept { background: rgba(147, 51, 234, 0.1); color: #9333ea; }
+    &.present { background: rgba(22, 163, 74, 0.1); color: var(--success-color); }
+  }
+
+  .metric-details {
+    display: flex;
+    flex-direction: column;
+
+    .metric-value {
+      font-size: 1.625rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+.quick-actions-panel {
+  .panel-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.875rem;
+  }
+
+  .actions-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    .btn-quick {
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      cursor: pointer;
+
+      &.primary {
+        background-color: var(--accent-blue);
+        color: #ffffff;
+        &:hover { background-color: var(--accent-hover); }
+      }
+
+      &.secondary {
+        background-color: var(--primary-color);
+        color: #ffffff;
+        &:hover { background-color: #162c48; }
+      }
+
+      &.outline {
+        border: 1px solid var(--border-color);
+        background: #F8FAFC;
+        color: var(--text-main);
+        &:hover { background: #E2E8F0; }
+      }
+
+      &.dark {
+        background-color: #0F172A;
+        color: #ffffff;
+        &:hover { background-color: #1E293B; }
+      }
+    }
+  }
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.25rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+
+  .panel-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .link-action {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  th {
+    background-color: #F8FAFC;
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .text-muted {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+  }
+}
+
+.activity-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+
+  .activity-item {
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--accent-blue);
+
+    .log-time {
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .log-action {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 0.125rem;
+    }
+
+    .log-details {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.125rem;
+    }
+  }
+}

@@ -1,0 +1,80 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo-box">D</div>
+      <h2>Activate Dayflow Account</h2>
+      <p class="tagline">Enter your assigned Employee ID and official email to sign up.</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-banner">
+      <span>⚠️ {{ errorMessage }}</span>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="employeeId">Assigned Employee ID</label>
+        <input
+          id="employeeId"
+          type="text"
+          formControlName="employeeId"
+          placeholder="e.g. EMP002"
+          [class.invalid]="registerForm.get('employeeId')?.invalid && registerForm.get('employeeId')?.touched"
+        />
+        <div *ngIf="registerForm.get('employeeId')?.invalid && registerForm.get('employeeId')?.touched" class="field-error">
+          Employee ID is required.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Official Email Address</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="rahul@dayflow.com"
+          [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+        />
+        <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="field-error">
+          Must match official email assigned by HR/Admin.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Create Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="At least 8 characters"
+          [class.invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+        />
+        <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="field-error">
+          Password must be at least 8 characters.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          formControlName="confirmPassword"
+          placeholder="Re-enter password"
+          [class.invalid]="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched"
+        />
+        <div *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched" class="field-error">
+          Passwords do not match.
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="registerForm.invalid || loading">
+        <span *ngIf="!loading">Create & Activate Account</span>
+        <span *ngIf="loading">Validating with Backend...</span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an active account? <a routerLink="/login">Sign In</a></p>
+    </div>
+  </div>
+</div>

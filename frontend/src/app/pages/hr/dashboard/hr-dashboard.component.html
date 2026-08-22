@@ -1,0 +1,152 @@
+<div class="dashboard-page">
+  <!-- Header -->
+  <div class="header-bar">
+    <div>
+      <h1 class="page-title">People Operations</h1>
+      <p class="subtitle">Employee workforce, attendance tracking & leave management</p>
+    </div>
+    <span class="badge badge-primary">HR Portal</span>
+  </div>
+
+  <div *ngIf="actionMessage" class="banner banner-success">
+    {{ actionMessage }}
+  </div>
+
+  <!-- Key Metrics Row -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon emp">👥</div>
+      <div class="metric-details">
+        <span class="metric-value">{{ employees.length }}</span>
+        <span class="metric-label">Total Employees</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon present">✓</div>
+      <div class="metric-details">
+        <span class="metric-value">{{ presentTodayCount }}</span>
+        <span class="metric-label">Present Today</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon leave">📅</div>
+      <div class="metric-details">
+        <span class="metric-value">{{ pendingLeavesCount }}</span>
+        <span class="metric-label">Pending Leave Requests</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon alert">⚠</div>
+      <div class="metric-details">
+        <span class="metric-value">{{ exceptions.length }}</span>
+        <span class="metric-label">Attendance Exceptions</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <!-- Pending Leave Requests -->
+    <div class="card-panel">
+      <div class="panel-header">
+        <h3 class="panel-title">Pending Leave Requests</h3>
+        <a routerLink="/hr/leaves" class="link-action">View All</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Type</th>
+              <th>Dates</th>
+              <th>Reason</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let leave of leaveRequests">
+              <td>
+                <div class="emp-name">{{ leave.employee?.firstName }} {{ leave.employee?.lastName }}</div>
+                <div class="emp-id">{{ leave.employee?.employeeId }} • {{ leave.employee?.department?.name }}</div>
+              </td>
+              <td><span class="badge badge-primary">{{ leave.leaveType }}</span></td>
+              <td>{{ leave.startDate }} to {{ leave.endDate }}</td>
+              <td class="reason-cell">{{ leave.reason }}</td>
+              <td>
+                <div *ngIf="leave.status === 'PENDING'" class="action-buttons">
+                  <button class="btn-approve" (click)="approveLeave(leave.id)">Approve</button>
+                  <button class="btn-reject" (click)="rejectLeave(leave.id)">Reject</button>
+                </div>
+                <span *ngIf="leave.status !== 'PENDING'" class="badge" [ngClass]="{
+                  'badge-success': leave.status === 'APPROVED',
+                  'badge-error': leave.status === 'REJECTED'
+                }">{{ leave.status }}</span>
+              </td>
+            </tr>
+            <tr *ngIf="leaveRequests.length === 0">
+              <td colspan="5" class="empty-cell">No leave requests found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Attendance Exceptions Widget -->
+    <div class="card-panel">
+      <div class="panel-header">
+        <h3 class="panel-title">Location & Geofence Exceptions</h3>
+        <a routerLink="/hr/exceptions" class="link-action">Review All</a>
+      </div>
+
+      <div class="exceptions-list">
+        <div *ngFor="let ex of exceptions" class="exception-item">
+          <div class="ex-icon">📍</div>
+          <div class="ex-info">
+            <div class="ex-emp">{{ ex.employee?.firstName }} {{ ex.employee?.lastName }} ({{ ex.employee?.employeeId }})</div>
+            <div class="ex-desc">{{ ex.remarks }}</div>
+            <div class="ex-time">{{ ex.date }} at {{ ex.checkIn | date:'shortTime' }}</div>
+          </div>
+        </div>
+        <div *ngIf="exceptions.length === 0" class="empty-cell">
+          ✓ No attendance exceptions logged today.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Directory Preview -->
+  <div class="card-panel">
+    <div class="panel-header">
+      <h3 class="panel-title">Employee Directory</h3>
+      <a routerLink="/hr/employees" class="link-action">Manage Directory</a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let emp of employees.slice(0, 5)">
+            <td><strong>{{ emp.employeeId }}</strong></td>
+            <td>{{ emp.firstName }} {{ emp.lastName }}</td>
+            <td>{{ emp.email }}</td>
+            <td>{{ emp.department?.name }}</td>
+            <td>{{ emp.designation }}</td>
+            <td><span class="badge badge-success">{{ emp.status }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

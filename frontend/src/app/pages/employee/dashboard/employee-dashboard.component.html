@@ -1,0 +1,147 @@
+<div class="dashboard-page">
+  <!-- Greeting Header -->
+  <div class="welcome-bar">
+    <div>
+      <h1 class="greeting">Welcome back, {{ currentUser?.firstName }} 👋</h1>
+      <p class="date-subtitle">{{ todayDate }} | My Workday Overview</p>
+    </div>
+    <span class="badge badge-primary">Employee Portal</span>
+  </div>
+
+  <!-- Status / Error Messages -->
+  <div *ngIf="statusMessage" class="banner banner-success">
+    {{ statusMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="banner banner-error">
+    ⚠️ {{ errorMessage }}
+  </div>
+
+  <!-- Top Metrics Row -->
+  <div class="metrics-grid">
+    <!-- Today's Attendance Card with GPS CTA -->
+    <div class="card-panel attendance-card">
+      <div class="card-header">
+        <span class="card-title">Today's Attendance</span>
+        <span class="badge" [ngClass]="{
+          'badge-success': todayAttendance?.status === 'PRESENT',
+          'badge-warning': todayAttendance?.status === 'LOCATION_EXCEPTION',
+          'badge-primary': !todayAttendance
+        }">
+          {{ todayAttendance ? todayAttendance.status : 'NOT CHECKED IN' }}
+        </span>
+      </div>
+
+      <div class="attendance-times">
+        <div class="time-block">
+          <span class="label">Check In</span>
+          <span class="val">{{ todayAttendance?.checkIn ? (todayAttendance?.checkIn | date:'shortTime') : '--:--' }}</span>
+        </div>
+        <div class="time-divider">→</div>
+        <div class="time-block">
+          <span class="label">Check Out</span>
+          <span class="val">{{ todayAttendance?.checkOut ? (todayAttendance?.checkOut | date:'shortTime') : '--:--' }}</span>
+        </div>
+      </div>
+
+      <div class="cta-actions">
+        <button
+          *ngIf="!todayAttendance"
+          class="btn-action checkin"
+          (click)="onCheckIn()"
+          [disabled]="locationLoading"
+        >
+          <span class="material-icons">my_location</span>
+          <span>{{ locationLoading ? 'Accessing GPS...' : 'GPS CHECK IN' }}</span>
+        </button>
+
+        <button
+          *ngIf="todayAttendance && !todayAttendance.checkOut"
+          class="btn-action checkout"
+          (click)="onCheckOut()"
+          [disabled]="locationLoading"
+        >
+          <span class="material-icons">logout</span>
+          <span>{{ locationLoading ? 'Accessing GPS...' : 'GPS CHECK OUT' }}</span>
+        </button>
+
+        <div *ngIf="todayAttendance && todayAttendance.checkOut" class="completed-msg">
+          ✓ Workday completed for today
+        </div>
+      </div>
+      <p class="geo-note">📍 Location verified using browser GPS geofence (200m radius)</p>
+    </div>
+
+    <!-- Leave Summary Card -->
+    <div class="card-panel">
+      <div class="card-header">
+        <span class="card-title">Leave Balance</span>
+        <a routerLink="/employee/leave" class="link-action">Apply Leave</a>
+      </div>
+      <div class="stat-highlight">
+        <span class="num">18</span>
+        <span class="unit">Days Available</span>
+      </div>
+      <div class="stat-breakdown">
+        <div><span>Paid:</span> <strong>12</strong></div>
+        <div><span>Sick:</span> <strong>6</strong></div>
+        <div><span>Pending:</span> <strong>{{ leaves.length }}</strong></div>
+      </div>
+    </div>
+
+    <!-- Salary Summary Card -->
+    <div class="card-panel">
+      <div class="card-header">
+        <span class="card-title">Salary Summary</span>
+        <a routerLink="/employee/payroll" class="link-action">View Paystub</a>
+      </div>
+      <div class="stat-highlight">
+        <span class="num">₹{{ payroll?.netSalary || '0.00' | number:'1.2-2' }}</span>
+        <span class="unit">Net Monthly Salary</span>
+      </div>
+      <div class="stat-breakdown">
+        <div><span>Basic:</span> ₹{{ payroll?.basicSalary || '0' | number }}</div>
+        <div><span>Allowances:</span> ₹{{ (payroll?.housingAllowance || 0) + (payroll?.transportAllowance || 0) | number }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Attendance Table -->
+  <div class="card-panel margin-top">
+    <div class="card-header">
+      <h3 class="card-title">Recent Attendance Log</h3>
+      <a routerLink="/employee/attendance" class="link-action">View All</a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Status</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let att of recentAttendance">
+            <td><strong>{{ att.date }}</strong></td>
+            <td>{{ att.checkIn ? (att.checkIn | date:'shortTime') : '--' }}</td>
+            <td>{{ att.checkOut ? (att.checkOut | date:'shortTime') : '--' }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'badge-success': att.status === 'PRESENT',
+                'badge-warning': att.status === 'LOCATION_EXCEPTION',
+                'badge-error': att.status === 'ABSENT'
+              }">{{ att.status }}</span>
+            </td>
+            <td class="text-muted">{{ att.remarks || 'Standard Check-in' }}</td>
+          </tr>
+          <tr *ngIf="recentAttendance.length === 0">
+            <td colspan="5" class="empty-cell">No recent attendance records found. Click <strong>GPS CHECK IN</strong> to log today's workday.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
