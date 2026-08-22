@@ -131,6 +131,10 @@ export class AdminDepartmentsComponent implements OnInit {
         this.toast.success('Department deleted successfully.');
         this.deleteConfirmId = null;
         this.loadData();
+      },
+      error: (err) => {
+        this.toast.error(err.error?.message || 'Failed to delete department.');
+        this.deleteConfirmId = null;
       }
     });
   }

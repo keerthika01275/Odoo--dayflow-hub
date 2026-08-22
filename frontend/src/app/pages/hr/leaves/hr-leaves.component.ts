@@ -60,7 +60,10 @@ export class HrLeavesComponent implements OnInit {
         this.isProcessing[leave.id!] = false;
         this.loadLeaves();
       },
-      error: () => { this.isProcessing[leave.id!] = false; }
+      error: (err) => {
+        this.toast.error(err.error?.message || 'Failed to approve leave.');
+        this.isProcessing[leave.id!] = false;
+      }
     });
   }
 
@@ -74,7 +77,10 @@ export class HrLeavesComponent implements OnInit {
         this.isProcessing[leave.id!] = false;
         this.loadLeaves();
       },
-      error: () => { this.isProcessing[leave.id!] = false; }
+      error: (err) => {
+        this.toast.error(err.error?.message || 'Failed to reject leave.');
+        this.isProcessing[leave.id!] = false;
+      }
     });
   }
 

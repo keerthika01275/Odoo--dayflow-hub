@@ -88,7 +88,10 @@ export class AdminPayrollComponent implements OnInit {
         this.closeModal();
         this.loadData();
       },
-      error: () => { this.isSaving = false; }
+      error: (err) => {
+        this.toast.error(err.error?.message || 'Failed to update payroll.');
+        this.isSaving = false;
+      }
     });
   }
 

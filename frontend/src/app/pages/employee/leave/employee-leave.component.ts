@@ -92,7 +92,10 @@ export class EmployeeLeaveComponent implements OnInit {
         this.closeForm();
         this.loadMyLeaves();
       },
-      error: () => { this.isSubmitting = false; }
+      error: (err) => {
+        this.toast.error(err.error?.message || 'Failed to submit leave application.');
+        this.isSubmitting = false;
+      }
     });
   }
 

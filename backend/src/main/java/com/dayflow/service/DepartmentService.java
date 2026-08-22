@@ -3,11 +3,14 @@ package com.dayflow.service;
 import com.dayflow.dto.DepartmentRequest;
 import com.dayflow.dto.DepartmentResponse;
 import com.dayflow.entity.Department;
+import com.dayflow.entity.Employee;
 import com.dayflow.exception.DuplicateResourceException;
 import com.dayflow.exception.ResourceNotFoundException;
 import com.dayflow.repository.DepartmentRepository;
+import com.dayflow.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
+    private final EmployeeRepository employeeRepository;
 
     public List<DepartmentResponse> getAllDepartments() {
         return departmentRepository.findAll()
@@ -58,10 +62,17 @@ public class DepartmentService {
         return DepartmentResponse.fromEntity(departmentRepository.save(dept));
     }
 
+    @Transactional
     public void deleteDepartment(Long id) {
-        if (!departmentRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Department not found with id: " + id);
+        Department dept = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+
+        List<Employee> employees = employeeRepository.findByDepartmentId(id);
+        for (Employee emp : employees) {
+            emp.setDepartment(null);
         }
-        departmentRepository.deleteById(id);
+        employeeRepository.saveAll(employees);
+
+        departmentRepository.delete(dept);
     }
 }

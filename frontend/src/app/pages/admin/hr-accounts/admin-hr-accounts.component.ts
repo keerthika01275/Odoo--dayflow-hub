@@ -101,7 +101,10 @@ export class AdminHrAccountsComponent implements OnInit {
         this.closeCreateModal();
         this.loadData();
       },
-      error: () => { this.isSubmitting = false; }
+      error: (err) => {
+        this.toast.error(err.error?.message || 'Failed to create HR account.');
+        this.isSubmitting = false;
+      }
     });
   }
 }
