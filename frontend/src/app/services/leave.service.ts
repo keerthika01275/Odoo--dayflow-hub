@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LeaveRequest } from '../models/models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class LeaveService {
-  private readonly API = 'http://localhost:8080/api/leaves';
+  private readonly API = `${environment.apiBaseUrl}/api/leaves`;
 
   constructor(private http: HttpClient) {}
 
